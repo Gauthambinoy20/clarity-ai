@@ -289,5 +289,33 @@ flowchart LR
     T1 -. rewrite .-> E2
 ```
 
-> The deployment/infrastructure diagram is added alongside the Terraform
-> code in `infra/` so it documents what is actually provisioned.
+## 9. Deployment & infrastructure
+
+What `infra/` provisions and how a push to main reaches production.
+TLS comes from Let's Encrypt for an sslip.io hostname derived from the
+Elastic IP, so no domain purchase is needed.
+
+```mermaid
+flowchart LR
+    subgraph GitHub
+        GH[push to main] --> CI[CI workflows]
+        GH --> CD[deploy.yml]
+        CD --> BLD["build backend + frontend images"]
+        BLD --> GHCR[(ghcr.io packages)]
+    end
+
+    subgraph AWS["AWS (infra/ Terraform, default vpc)"]
+        subgraph EC2["EC2 instance (Ubuntu 24.04, gp3 encrypted, IMDSv2)"]
+            CADDY["caddy:2<br/>TLS + redirect"] --> NGINX["frontend nginx<br/>SPA + /api,/ws proxy"] --> API2[backend FastAPI]
+            VOLS[("volumes: db · uploads ·<br/>hf model cache · caddy certs")]
+            API2 --- VOLS
+        end
+        SG["security group<br/>80/443 open · 22 admin-only"]
+        EIP[Elastic IP] --- EC2
+    end
+
+    U2[User] -- "https://&lt;ip dashes&gt;.sslip.io" --> CADDY
+    CD -- "ssh: compose pull + up" --> EC2
+    GHCR -- image pull --> EC2
+    CD -- "curl /api/v1/health" --> CADDY
+```

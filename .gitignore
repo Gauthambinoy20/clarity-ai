@@ -32,3 +32,9 @@ Thumbs.db
 ROADMAP.md
 docs/JOURNAL.md
 docs/TECHNICAL_REPORT.md
+
+# terraform working files — the lock file IS committed, providers are not
+infra/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars

@@ -1,0 +1,7 @@
+# TLS for the sslip.io hostname (resolves to this box's Elastic IP),
+# certificate from Let's Encrypt, everything proxied to the frontend
+# whose nginx serves the SPA and forwards /api and /ws to the backend.
+{$LIVE_DOMAIN} {
+	encode gzip
+	reverse_proxy frontend:5173
+}

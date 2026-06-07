@@ -1,0 +1,50 @@
+# Production stack: Caddy terminates TLS for the sslip.io hostname and
+# proxies to the frontend's nginx, which serves the SPA and forwards
+# /api and /ws to the backend. Images come from GHCR via the CD workflow.
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - LIVE_DOMAIN=${LIVE_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+
+  backend:
+    image: ghcr.io/gauthambinoy20/clarity-ai-backend:latest
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/clarityai.db
+      - SECRET_KEY=${SECRET_KEY:?set SECRET_KEY in /opt/clarityai/.env}
+      - CORS_ORIGINS=https://${LIVE_DOMAIN}
+    volumes:
+      - db-data:/app/data
+      - uploads:/app/uploads
+      - hf-cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    image: ghcr.io/gauthambinoy20/clarity-ai-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  caddy-data:
+  caddy-config:
+  db-data:
+  uploads:
+  hf-cache:
