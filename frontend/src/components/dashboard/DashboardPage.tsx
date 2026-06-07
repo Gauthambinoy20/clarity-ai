@@ -85,9 +85,11 @@ export default function DashboardPage() {
         getDashboardTrends(),
         getTopSignals(10),
       ]);
-      setStats(s);
-      setTrends(t);
-      setSignals(sig);
+      setStats(s ?? null);
+      setTrends(t ?? null);
+      // never let a bad payload become non-array state — the render
+      // maps over this unconditionally
+      setSignals(Array.isArray(sig) ? sig : []);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to load dashboard data";
       setError(msg);
