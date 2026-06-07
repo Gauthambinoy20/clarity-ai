@@ -102,82 +102,73 @@ _detectors_cache: Dict[str, Any] = {}
 
 
 def _get_detectors():
-    """Lazy-load detectors to avoid import-time model loading."""
-    if not _detectors_cache:
-        try:
-            from app.ml.detectors import (  # type: ignore[attr-defined]
-                PerplexityDetector,
-                ZeroShotDetector,
-                GLTRDetector,
-                EntropyDetector,
-                BurstinessDetector,
-                RepetitionDetector,
-                VocabularyRichnessDetector,
-                SentenceLengthDetector,
-                CoherenceDetector,
-                PunctuationDetector,
-                ReadabilityDetector,
-                NamedEntityDetector,
-                POSPatternDetector,
-                WatermarkDetector,
-            )
+    """Lazy-load detectors to avoid import-time model loading.
 
-            _detectors_cache["all"] = [
-                PerplexityDetector(),
-                ZeroShotDetector(),
-                GLTRDetector(),
-                EntropyDetector(),
-                BurstinessDetector(),
-                RepetitionDetector(),
-                VocabularyRichnessDetector(),
-                SentenceLengthDetector(),
-                CoherenceDetector(),
-                PunctuationDetector(),
-                ReadabilityDetector(),
-                NamedEntityDetector(),
-                POSPatternDetector(),
-                WatermarkDetector(),
-            ]
-            _detectors_cache["fast"] = [
-                _detectors_cache["all"][0],  # perplexity
-                _detectors_cache["all"][1],  # zero_shot
-                _detectors_cache["all"][2],  # gltr
-            ]
-        except ImportError:
-            logger.warning("ML detectors not yet implemented — using stubs")
-            _detectors_cache["all"] = []
-            _detectors_cache["fast"] = []
+    Import errors are deliberately NOT swallowed here: a missing detector
+    is a deployment bug and must surface loudly, never as fake results.
+    """
+    if not _detectors_cache:
+        from app.ml.detectors import (
+            AIFingerprintDetector,
+            BinocularsDetector,
+            CoherenceDetector,
+            EntropyAnalyzerDetector,
+            FastDetectGPTDetector,
+            GLTRDetector,
+            GhostbusterDetector,
+            PerplexityBurstinessDetector,
+            POSPatternsDetector,
+            RepetitionDetector,
+            StylometricDetector,
+            VocabularyRichnessDetector,
+            WatermarkDetector,
+            ZeroShotEnsembleDetector,
+        )
+
+        perplexity = PerplexityBurstinessDetector()
+        gltr = GLTRDetector()
+        zero_shot = ZeroShotEnsembleDetector()
+
+        _detectors_cache["all"] = [
+            perplexity,
+            gltr,
+            zero_shot,
+            FastDetectGPTDetector(),
+            BinocularsDetector(),
+            GhostbusterDetector(),
+            EntropyAnalyzerDetector(),
+            StylometricDetector(),
+            POSPatternsDetector(),
+            VocabularyRichnessDetector(),
+            RepetitionDetector(),
+            CoherenceDetector(),
+            WatermarkDetector(),
+            AIFingerprintDetector(),
+        ]
+        # Fast mode trades the heavy ensemble for the three strongest
+        # signals that share one cached GPT-2 between them.
+        _detectors_cache["fast"] = [perplexity, gltr, zero_shot]
     return _detectors_cache
 
 
 def _get_ensemble():
-    """Lazy-load ensemble meta-learner."""
-    try:
-        from app.ml.ensemble import MetaLearner  # type: ignore[attr-defined]
+    """Lazy-load the ensemble meta-learner."""
+    from app.ml.ensemble import EnsembleMetaLearner
 
-        return MetaLearner()
-    except ImportError:
-        logger.warning("Ensemble meta-learner not yet implemented — using average")
-        return None
+    return EnsembleMetaLearner()
 
 
 def _get_sentence_analyzer():
-    """Lazy-load sentence-level analyzer."""
-    try:
-        from app.ml.detectors import SentenceLevelAnalyzer  # type: ignore[attr-defined]
+    """Lazy-load the sentence-level detector for per-sentence heatmaps."""
+    from app.ml.detectors import SentenceLevelDetector
 
-        return SentenceLevelAnalyzer()
-    except ImportError:
-        logger.warning("Sentence-level analyzer not yet implemented")
-        return None
+    return SentenceLevelDetector()
 
 
 async def _run_detector(detector: Any, text: str) -> dict:
-    """Run a single detector in a thread pool (they are CPU-bound)."""
-    loop = asyncio.get_running_loop()
+    """Run one detector; a failure degrades to a flagged neutral result."""
     try:
-        result = await loop.run_in_executor(None, detector.analyze, text)
-        return result
+        return await detector.analyze(text)
     except Exception as exc:
         logger.error("Detector %s failed: %s", type(detector).__name__, exc)
         return {
@@ -186,6 +177,38 @@ async def _run_detector(detector: Any, text: str) -> dict:
             "confidence": "low",
             "error": str(exc),
         }
+
+
+# The meta-learner's feature vector predates the final detector names;
+# translate real signal names onto the features it was built around.
+_SIGNAL_TO_FEATURE = {
+    "entropy_analyzer": "entropy",
+    "pos_patterns": "pos_pattern",
+    "fast_detectgpt": "detectgpt",
+    "zero_shot_ensemble": "ai_content_detector",
+    "stylometric": "stylometric",
+    "vocabulary_richness": "vocabulary_richness",
+    "repetition": "repetition",
+    "coherence": "coherence",
+    "binoculars": "binoculars",
+    "watermark": "watermark",
+}
+
+
+def _bridge_signals(signals: List[dict]) -> Dict[str, dict]:
+    """Key detector results by the feature names the meta-learner expects."""
+    by_feature: Dict[str, dict] = {}
+    for s in signals:
+        name = s.get("signal", "")
+        if name == "perplexity_burstiness":
+            # One detector feeds two ensemble features via its sub-scores.
+            sub = s.get("sub_scores", {})
+            base = s.get("ai_probability", 0.5)
+            by_feature["perplexity"] = {**s, "ai_probability": sub.get("ppl_score", base)}
+            by_feature["burstiness"] = {**s, "ai_probability": sub.get("cv_score", base)}
+        elif name in _SIGNAL_TO_FEATURE:
+            by_feature[_SIGNAL_TO_FEATURE[name]] = s
+    return by_feature
 
 
 def _classify(score: float) -> str:
@@ -218,14 +241,15 @@ def _combine_scores(signals: List[dict], ensemble: Any) -> float:
     probs = [s["ai_probability"] for s in signals]
     if ensemble is not None:
         try:
-            return ensemble.predict(signals)
-        except Exception:
-            pass
-    # Fallback: weighted average (perplexity & zero-shot get 2x weight)
+            prediction = ensemble.predict(_bridge_signals(signals))
+            return float(prediction["overall_score"])
+        except Exception as exc:
+            logger.warning("Ensemble prediction failed, using weighted average: %s", exc)
+    # Fallback: weighted average (the three strongest signals get 2x weight)
     weights = []
     for s in signals:
         name = s.get("signal", "").lower()
-        if name in ("perplexity", "zero_shot", "gltr"):
+        if name in ("perplexity_burstiness", "zero_shot_ensemble", "gltr"):
             weights.append(2.0)
         else:
             weights.append(1.0)
@@ -258,16 +282,11 @@ async def _run_full_detection(
 
     detector_list = detectors_map.get("fast" if mode == "fast" else "all", [])
 
-    # Run all detectors in parallel
-    if detector_list:
-        signal_results = await asyncio.gather(*[_run_detector(d, text) for d in detector_list])
-    else:
-        # Stub results when detectors are not yet implemented
-        signal_results = [
-            {"signal": "perplexity", "ai_probability": 0.5, "confidence": "low"},
-            {"signal": "zero_shot", "ai_probability": 0.5, "confidence": "low"},
-            {"signal": "gltr", "ai_probability": 0.5, "confidence": "low"},
-        ]
+    # Run all detectors concurrently; an empty roster is a deployment bug
+    # and must never degrade into made-up neutral scores.
+    if not detector_list:
+        raise HTTPException(status_code=503, detail="Detection engine unavailable")
+    signal_results = await asyncio.gather(*[_run_detector(d, text) for d in detector_list])
 
     overall_score = _combine_scores(signal_results, ensemble)
     classification = _classify(overall_score)
@@ -276,44 +295,44 @@ async def _run_full_detection(
     # Sentence-level analysis
     sentence_analysis = None
     if options.include_sentence_scores:
-        analyzer = _get_sentence_analyzer()
-        if analyzer is not None:
-            loop = asyncio.get_running_loop()
-            try:
-                raw = await loop.run_in_executor(None, analyzer.analyze, text)
-                sentence_analysis = [
-                    {
-                        "sentence": s["sentence"],
-                        "ai_probability": s["ai_probability"],
-                        "highlight": (
-                            "high"
-                            if s["ai_probability"] >= 0.75
-                            else "medium" if s["ai_probability"] >= 0.4 else "low"
-                        ),
-                    }
-                    for s in raw
-                ]
-            except Exception as exc:
-                logger.error("Sentence analysis failed: %s", exc)
+        try:
+            raw = await _get_sentence_analyzer().analyze(text)
+            sentence_analysis = [
+                {
+                    "sentence": s["text"],
+                    "ai_probability": s["ai_probability"],
+                    "highlight": (
+                        "high"
+                        if s["ai_probability"] >= 0.75
+                        else "medium" if s["ai_probability"] >= 0.4 else "low"
+                    ),
+                }
+                for s in raw.get("per_sentence", [])
+            ] or None
+        except Exception as exc:
+            logger.error("Sentence analysis failed: %s", exc)
 
     # GLTR token data
     gltr_tokens = None
     if options.include_gltr_data:
         for sr in signal_results:
-            if sr.get("signal") == "gltr" and "tokens" in sr:
-                gltr_tokens = sr["tokens"]
+            if sr.get("signal") == "gltr" and "token_data" in sr:
+                gltr_tokens = sr["token_data"]
                 break
 
-    # Attribution
+    # Attribution: the fingerprint detector scores per model family
     attribution = None
     if options.include_attribution:
         for sr in signal_results:
-            if sr.get("signal") == "zero_shot" and "model_scores" in sr:
-                best = max(sr["model_scores"], key=lambda m: m.get("score", 0))
+            if sr.get("signal") == "ai_fingerprint" and sr.get("most_likely_model"):
+                model_probs = sr.get("details", {}).get("model_probabilities", {})
+                likely = sr["most_likely_model"]
                 attribution = {
-                    "likely_model": best.get("model", "unknown"),
-                    "model_confidence": best.get("score", 0.0),
-                    "all_model_scores": sr["model_scores"],
+                    "likely_model": likely,
+                    "model_confidence": model_probs.get(likely, 0.0),
+                    "all_model_scores": [
+                        {"model": m, "score": p} for m, p in model_probs.items()
+                    ],
                 }
                 break
 
