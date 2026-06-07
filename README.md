@@ -1,15 +1,12 @@
 # ClarityAI — AI Content Analysis Portfolio Project
 
-[![CI](https://github.com/gauthambinoy/cipher-prose-truth/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
+[![CI](https://github.com/Gauthambinoy20/clarity-ai/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB.svg)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com)
 
 ClarityAI is a full-stack AI text analysis app built to demonstrate production-oriented NLP engineering: a FastAPI backend, React/TypeScript frontend, Dockerized local development, CI, and free-tier deployment paths.
-
-**Live demo:** https://clarityai-pied.vercel.app
-**API docs:** https://gxm00009-clarityai.hf.space/api/v1/docs
 
 > Recruiter note: this is a portfolio project, not a claim of definitive authorship attribution. AI detection is probabilistic and should be used as a writing-signal assistant, not as evidence of misconduct.
 
