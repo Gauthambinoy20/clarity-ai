@@ -278,8 +278,9 @@ export default function SEOAnalyzer({ data }: SEOAnalyzerProps) {
                       borderRadius: 8,
                       fontSize: 13,
                     }}
-                    formatter={(value: number, _name: string, props: { payload: { density: number } }) => [
-                      `${value} (${props.payload.density.toFixed(2)}%)`,
+                    formatter={(value, _name, item) => [
+                      // recharts owns the param types; density rides on the row payload
+                      `${value} (${(item.payload as { density: number }).density.toFixed(2)}%)`,
                       "Occurrences",
                     ]}
                   />
