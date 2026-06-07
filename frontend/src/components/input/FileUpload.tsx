@@ -40,11 +40,14 @@ export default function FileUpload({ onFileContent, disabled }: FileUploadProps)
     });
 
   return (
-    <Card
-      {...getRootProps()}
-      component={motion.div}
+    // motion lives on a wrapper div: spreading dropzone's root props onto a
+    // motion component makes the onDrag* handler types collide
+    <motion.div
       whileHover={disabled ? {} : { scale: 1.01 }}
       whileTap={disabled ? {} : { scale: 0.99 }}
+    >
+    <Card
+      {...getRootProps()}
       sx={{
         p: 4,
         textAlign: "center",
@@ -84,5 +87,6 @@ export default function FileUpload({ onFileContent, disabled }: FileUploadProps)
         </>
       )}
     </Card>
+    </motion.div>
   );
 }
