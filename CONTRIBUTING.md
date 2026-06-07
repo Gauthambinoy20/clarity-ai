@@ -25,8 +25,8 @@ Thank you for your interest in contributing to ClarityAI. This guide covers ever
 
 ```bash
 # 1. Clone the repo (if you haven't already)
-git clone https://github.com/your-username/ClarityAI.git
-cd ClarityAI/backend
+git clone https://github.com/Gauthambinoy20/clarity-ai.git
+cd clarity-ai/backend
 
 # 2. Create and activate a virtual environment
 python -m venv venv
