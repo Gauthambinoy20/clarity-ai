@@ -841,7 +841,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const { data } = await api.get<ApiDashboardStats>("/dashboard/stats");
   return {
     totalAnalyses: data.total_analyses,
-    avgAiScore: data.average_ai_score,
+    // the stat card renders this raw, so scale to the 0-100 range like
+    // every other score in the app
+    avgAiScore: Math.round(data.average_ai_score * 100),
     totalWords: data.total_words_analyzed,
     analysesToday: data.analyses_today,
   };

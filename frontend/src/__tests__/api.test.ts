@@ -718,7 +718,7 @@ describe("dashboard adapters", () => {
     const r = await getDashboardStats();
     expect(r).toEqual({
       totalAnalyses: 100,
-      avgAiScore: 0.42,
+      avgAiScore: 42, // scaled to the 0-100 range the stat card renders
       totalWords: 50000,
       analysesToday: 5,
     });
