@@ -48,8 +48,7 @@ export function useCitations() {
 
 export function useComparison() {
   return useMutation({
-    mutationFn: ({ textA, textB }: { textA: string; textB: string }) =>
-      compareTexts(textA, textB),
+    mutationFn: ({ textA, textB }: { textA: string; textB: string }) => compareTexts(textA, textB),
   });
 }
 

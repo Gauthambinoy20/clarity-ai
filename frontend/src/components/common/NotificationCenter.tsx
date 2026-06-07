@@ -174,9 +174,7 @@ export default function NotificationCenter() {
                   "&:hover": { backgroundColor: "action.hover" },
                 }}
               >
-                <ListItemIcon sx={{ minWidth: 32 }}>
-                  {typeIcons[notif.type]}
-                </ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 32 }}>{typeIcons[notif.type]}</ListItemIcon>
                 <ListItemText
                   primary={notif.message}
                   secondary={formatTime(notif.timestamp)}

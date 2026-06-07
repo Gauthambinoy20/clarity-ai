@@ -137,9 +137,7 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
     avgScore:
       items.filter((i) => i.aiScore !== null).length > 0
         ? Math.round(
-            items
-              .filter((i) => i.aiScore !== null)
-              .reduce((sum, i) => sum + (i.aiScore || 0), 0) /
+            items.filter((i) => i.aiScore !== null).reduce((sum, i) => sum + (i.aiScore || 0), 0) /
               items.filter((i) => i.aiScore !== null).length
           )
         : 0,
@@ -211,17 +209,13 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
     const pending = items.filter((i) => i.status === "pending" || i.status === "error");
     for (let idx = 0; idx < pending.length; idx++) {
       const item = pending[idx];
-      setItems((prev) =>
-        prev.map((i) => (i.id === item.id ? { ...i, status: "processing" } : i))
-      );
+      setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: "processing" } : i)));
 
       try {
         if (onProcessBatch) {
           const results = await onProcessBatch([item]);
           if (results[0]) {
-            setItems((prev) =>
-              prev.map((i) => (i.id === item.id ? results[0] : i))
-            );
+            setItems((prev) => prev.map((i) => (i.id === item.id ? results[0] : i)));
           }
         } else {
           // Demo mode: simulate processing
@@ -363,9 +357,7 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
               },
             }}
           >
-            <CloudUploadOutlinedIcon
-              sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
-            />
+            <CloudUploadOutlinedIcon sx={{ fontSize: 48, color: "text.secondary", mb: 1 }} />
             <Typography variant="body1" fontWeight={600}>
               Drop files here or click to upload
             </Typography>
@@ -382,11 +374,7 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
             />
           </Box>
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ textAlign: "center", my: 2 }}
-          >
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", my: 2 }}>
             or paste multiple texts separated by ---
           </Typography>
 
@@ -394,7 +382,9 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
             multiline
             rows={4}
             fullWidth
-            placeholder={"First text content here...\n---\nSecond text content here...\n---\nThird text..."}
+            placeholder={
+              "First text content here...\n---\nSecond text content here...\n---\nThird text..."
+            }
             value={pasteText}
             onChange={(e) => setPasteText(e.target.value)}
             sx={{
@@ -418,7 +408,10 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
               variant="contained"
               startIcon={<PlayArrowIcon />}
               onClick={handleProcessAll}
-              disabled={isProcessing || items.filter((i) => i.status === "pending" || i.status === "error").length === 0}
+              disabled={
+                isProcessing ||
+                items.filter((i) => i.status === "pending" || i.status === "error").length === 0
+              }
               sx={{
                 background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               }}
@@ -479,7 +472,12 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
                           <InsertDriveFileOutlinedIcon
                             sx={{ fontSize: 18, color: "text.secondary" }}
                           />
-                          <Typography variant="body2" fontWeight={500} noWrap sx={{ maxWidth: 200 }}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={500}
+                            noWrap
+                            sx={{ maxWidth: 200 }}
+                          >
                             {item.filename}
                           </Typography>
                         </Box>

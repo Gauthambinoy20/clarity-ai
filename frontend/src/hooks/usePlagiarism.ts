@@ -12,8 +12,7 @@ export function usePlagiarism() {
   const { setPlagiarismResult, setIsAnalyzing } = useAppStore();
 
   return useMutation({
-    mutationFn: ({ text, options }: PlagiarismParams) =>
-      analyzePlagiarism(text, options),
+    mutationFn: ({ text, options }: PlagiarismParams) => analyzePlagiarism(text, options),
     onMutate: () => {
       setIsAnalyzing(true);
       setPlagiarismResult(null);

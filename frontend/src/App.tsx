@@ -134,14 +134,10 @@ export default function App() {
                 }}
                 sx={{
                   borderRadius: 2,
-                  backgroundColor: isActive
-                    ? "primary.main"
-                    : "transparent",
+                  backgroundColor: isActive ? "primary.main" : "transparent",
                   color: isActive ? "#fff" : "text.primary",
                   "&:hover": {
-                    backgroundColor: isActive
-                      ? "primary.dark"
-                      : "action.hover",
+                    backgroundColor: isActive ? "primary.dark" : "action.hover",
                   },
                 }}
               >
@@ -164,12 +160,7 @@ export default function App() {
       </List>
       <Divider />
       <Box sx={{ p: 2, textAlign: "center" }}>
-        <Chip
-          label="v1.0.0"
-          size="small"
-          variant="outlined"
-          sx={{ fontSize: "0.7rem" }}
-        />
+        <Chip label="v1.0.0" size="small" variant="outlined" sx={{ fontSize: "0.7rem" }} />
       </Box>
     </Box>
   );
@@ -220,22 +211,14 @@ export default function App() {
         >
           <Toolbar>
             {isMobile && (
-              <IconButton
-                edge="start"
-                onClick={() => setDrawerOpen(true)}
-                sx={{ mr: 1 }}
-              >
+              <IconButton edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 1 }}>
                 <MenuIcon />
               </IconButton>
             )}
             <Box sx={{ flex: 1 }} />
             <NotificationCenter />
             <IconButton onClick={toggleTheme} color="inherit">
-              {themeMode === "dark" ? (
-                <Brightness7Icon />
-              ) : (
-                <Brightness4Icon />
-              )}
+              {themeMode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
           </Toolbar>
         </AppBar>

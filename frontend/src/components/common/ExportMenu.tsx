@@ -1,13 +1,5 @@
 import { useState, useCallback } from "react";
-import {
-  Button,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+import { Button, Menu, MenuItem, ListItemIcon, ListItemText, Snackbar, Alert } from "@mui/material";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
 import DataObjectOutlinedIcon from "@mui/icons-material/DataObjectOutlined";
@@ -32,12 +24,9 @@ export default function ExportMenu({ data, text, disabled = false }: ExportMenuP
 
   const open = Boolean(anchorEl);
 
-  const showToast = useCallback(
-    (message: string, severity: "success" | "error" = "success") => {
-      setSnackbar({ open: true, message, severity });
-    },
-    []
-  );
+  const showToast = useCallback((message: string, severity: "success" | "error" = "success") => {
+    setSnackbar({ open: true, message, severity });
+  }, []);
 
   const handleExportPdf = useCallback(async () => {
     setAnchorEl(null);

@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Card,
-  Typography,
-  LinearProgress,
-  Collapse,
-  IconButton,
-  Chip,
-} from "@mui/material";
+import { Box, Card, Typography, LinearProgress, Collapse, IconButton, Chip } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 import type { SignalScore } from "@/types/analysis";
@@ -64,9 +56,7 @@ export default function SignalBreakdown({ signals }: SignalBreakdownProps) {
                   cursor: "pointer",
                   "&:hover": { borderColor: "primary.main" },
                 }}
-                onClick={() =>
-                  setExpandedId(isExpanded ? null : signal.name)
-                }
+                onClick={() => setExpandedId(isExpanded ? null : signal.name)}
               >
                 <Box
                   sx={{
@@ -92,11 +82,7 @@ export default function SignalBreakdown({ signals }: SignalBreakdownProps) {
                     />
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight={700}
-                      sx={{ color }}
-                    >
+                    <Typography variant="body2" fontWeight={700} sx={{ color }}>
                       {Math.round(signal.score * 100)}%
                     </Typography>
                     <IconButton

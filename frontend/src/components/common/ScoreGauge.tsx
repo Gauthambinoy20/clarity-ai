@@ -22,12 +22,7 @@ function getLabel(score: number): string {
   return "AI Generated";
 }
 
-export default function ScoreGauge({
-  score,
-  confidence,
-  label,
-  size = 220,
-}: ScoreGaugeProps) {
+export default function ScoreGauge({ score, confidence, label, size = 220 }: ScoreGaugeProps) {
   const theme = useTheme();
   const radius = (size - 24) / 2;
   const circumference = 2 * Math.PI * radius * 0.75;
@@ -133,11 +128,7 @@ export default function ScoreGauge({
       </motion.div>
 
       {confidence !== undefined && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
           <Typography variant="caption" color="text.secondary">
             Confidence: {Math.round(confidence * 100)}%
           </Typography>

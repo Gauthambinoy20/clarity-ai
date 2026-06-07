@@ -285,7 +285,9 @@ export default function VersionHistory({ versions, onVersionSelect }: VersionHis
                         },
                       }}
                     >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}
+                      >
                         <Typography variant="body2" fontWeight={700}>
                           Version {version.versionNumber}
                         </Typography>
@@ -316,7 +318,11 @@ export default function VersionHistory({ versions, onVersionSelect }: VersionHis
                           />
                         )}
                         <IconButton size="small">
-                          {isExpanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+                          {isExpanded ? (
+                            <ExpandLessIcon fontSize="small" />
+                          ) : (
+                            <ExpandMoreIcon fontSize="small" />
+                          )}
                         </IconButton>
                       </Box>
 
@@ -330,7 +336,12 @@ export default function VersionHistory({ versions, onVersionSelect }: VersionHis
                             transition={{ duration: 0.3 }}
                           >
                             <Box sx={{ mt: 2 }}>
-                              <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 1, display: "block" }}>
+                              <Typography
+                                variant="caption"
+                                fontWeight={600}
+                                color="text.secondary"
+                                sx={{ mb: 1, display: "block" }}
+                              >
                                 Changes from previous version
                               </Typography>
                               <DiffView segments={version.diff} />

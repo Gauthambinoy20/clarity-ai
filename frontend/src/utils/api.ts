@@ -122,10 +122,7 @@ export async function extractCitations(text: string): Promise<CitationResult> {
   return data;
 }
 
-export async function compareTexts(
-  textA: string,
-  textB: string
-): Promise<ComparisonResult> {
+export async function compareTexts(textA: string, textB: string): Promise<ComparisonResult> {
   const { data } = await api.post<ComparisonResult>("/analytics/compare", {
     text_a: textA,
     text_b: textB,
@@ -140,39 +137,22 @@ export async function runFullAnalytics(text: string): Promise<FullAnalyticsResul
 
 // --- Export endpoints ---
 
-export async function exportPdf(
-  data: Record<string, unknown>,
-  text: string
-): Promise<Blob> {
-  const response = await api.post(
-    "/export/pdf",
-    { data, text },
-    { responseType: "blob" }
-  );
+export async function exportPdf(data: Record<string, unknown>, text: string): Promise<Blob> {
+  const response = await api.post("/export/pdf", { data, text }, { responseType: "blob" });
   return response.data;
 }
 
 export async function exportJson(data: Record<string, unknown>): Promise<Blob> {
-  const response = await api.post(
-    "/export/json",
-    { data },
-    { responseType: "blob" }
-  );
+  const response = await api.post("/export/json", { data }, { responseType: "blob" });
   return response.data;
 }
 
 export async function exportCsv(data: Record<string, unknown>): Promise<Blob> {
-  const response = await api.post(
-    "/export/csv",
-    { data },
-    { responseType: "blob" }
-  );
+  const response = await api.post("/export/csv", { data }, { responseType: "blob" });
   return response.data;
 }
 
-export async function getShareLink(
-  data: Record<string, unknown>
-): Promise<{ url: string }> {
+export async function getShareLink(data: Record<string, unknown>): Promise<{ url: string }> {
   const { data: result } = await api.post<{ url: string }>("/export/share", {
     data,
   });
@@ -278,10 +258,7 @@ export interface VersionEntry {
   diff?: { type: "added" | "removed" | "unchanged"; text: string }[];
 }
 
-export async function submitVersion(
-  documentId: string,
-  text: string
-): Promise<VersionEntry> {
+export async function submitVersion(documentId: string, text: string): Promise<VersionEntry> {
   const { data } = await api.post<VersionEntry>("/advanced/version", {
     document_id: documentId,
     text,
@@ -289,9 +266,7 @@ export async function submitVersion(
   return data;
 }
 
-export async function getVersionHistory(
-  documentId: string
-): Promise<VersionEntry[]> {
+export async function getVersionHistory(documentId: string): Promise<VersionEntry[]> {
   const { data } = await api.get<VersionEntry[]>(`/advanced/version/${documentId}`);
   return data;
 }
@@ -306,9 +281,7 @@ export interface CoachSuggestion {
   explanation: string;
 }
 
-export async function getCoachSuggestions(
-  text: string
-): Promise<CoachSuggestion[]> {
+export async function getCoachSuggestions(text: string): Promise<CoachSuggestion[]> {
   const { data } = await api.post<CoachSuggestion[]>("/advanced/coach", { text });
   return data;
 }
@@ -346,9 +319,7 @@ export async function processBatch(
   return data;
 }
 
-export async function getBatchResults(
-  batchId: string
-): Promise<BatchResponse> {
+export async function getBatchResults(batchId: string): Promise<BatchResponse> {
   const { data } = await api.get<BatchResponse>(`/advanced/batch/${batchId}`);
   return data;
 }

@@ -6,10 +6,7 @@ interface GLTRVisualizationProps {
   tokens: GLTRToken[];
 }
 
-const categoryConfig: Record<
-  string,
-  { color: string; label: string; bg: string }
-> = {
+const categoryConfig: Record<string, { color: string; label: string; bg: string }> = {
   top10: { color: "#22c55e", label: "Top 10", bg: "#22c55e30" },
   top100: { color: "#f59e0b", label: "Top 100", bg: "#f59e0b30" },
   top1000: { color: "#ef4444", label: "Top 1000", bg: "#ef444430" },
@@ -49,9 +46,15 @@ export default function GLTRVisualization({ tokens }: GLTRVisualizationProps) {
         ))}
       </Box>
 
-      <Typography variant="caption" color="text.secondary" gutterBottom display="block" sx={{ mb: 2 }}>
-        AI-generated text tends to favor top-ranked tokens (green). More rare
-        tokens (purple) suggests human writing.
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        gutterBottom
+        display="block"
+        sx={{ mb: 2 }}
+      >
+        AI-generated text tends to favor top-ranked tokens (green). More rare tokens (purple)
+        suggests human writing.
       </Typography>
 
       {/* Token display */}

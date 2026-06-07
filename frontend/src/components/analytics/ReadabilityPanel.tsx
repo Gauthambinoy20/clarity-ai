@@ -1,11 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  useTheme,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, Chip, useTheme } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
@@ -192,9 +185,7 @@ export default function ReadabilityPanel({ data }: ReadabilityPanelProps) {
                     mt: 1,
                   }}
                 >
-                  <MenuBookOutlinedIcon
-                    sx={{ fontSize: 32, color: "primary.main" }}
-                  />
+                  <MenuBookOutlinedIcon sx={{ fontSize: 32, color: "primary.main" }} />
                   <Typography variant="h4" fontWeight={700}>
                     {data.reading_time_minutes.toFixed(1)}
                   </Typography>
@@ -211,9 +202,7 @@ export default function ReadabilityPanel({ data }: ReadabilityPanelProps) {
                     mt: 0.5,
                   }}
                 >
-                  <TimerOutlinedIcon
-                    sx={{ fontSize: 16, color: "text.secondary" }}
-                  />
+                  <TimerOutlinedIcon sx={{ fontSize: 16, color: "text.secondary" }} />
                   <Typography variant="caption" color="text.secondary">
                     {data.reading_time_seconds}s at avg speed
                   </Typography>
@@ -266,12 +255,7 @@ export default function ReadabilityPanel({ data }: ReadabilityPanelProps) {
                 label="Gunning Fog"
                 delay={0.1}
               />
-              <CircularGauge
-                value={data.smog_index}
-                maxValue={20}
-                label="SMOG"
-                delay={0.2}
-              />
+              <CircularGauge value={data.smog_index} maxValue={20} label="SMOG" delay={0.2} />
               <CircularGauge
                 value={data.coleman_liau}
                 maxValue={20}
@@ -284,12 +268,7 @@ export default function ReadabilityPanel({ data }: ReadabilityPanelProps) {
                 label="ARI"
                 delay={0.4}
               />
-              <CircularGauge
-                value={data.dale_chall}
-                maxValue={12}
-                label="Dale-Chall"
-                delay={0.5}
-              />
+              <CircularGauge value={data.dale_chall} maxValue={12} label="Dale-Chall" delay={0.5} />
               <CircularGauge
                 value={data.linsear_write}
                 maxValue={20}
@@ -309,17 +288,12 @@ export default function ReadabilityPanel({ data }: ReadabilityPanelProps) {
             <Box sx={{ width: "100%", height: 320, mt: 2 }}>
               <ResponsiveContainer>
                 <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={theme.palette.divider}
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                   <XAxis
                     dataKey="name"
                     tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                   />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-                  />
+                  <YAxis tick={{ fontSize: 11, fill: theme.palette.text.secondary }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
@@ -338,8 +312,8 @@ export default function ReadabilityPanel({ data }: ReadabilityPanelProps) {
                           norm > 0.6
                             ? theme.palette.success.main
                             : norm > 0.3
-                            ? theme.palette.warning.main
-                            : theme.palette.error.main;
+                              ? theme.palette.warning.main
+                              : theme.palette.error.main;
                       }
                       return <Cell key={index} fill={color} />;
                     })}

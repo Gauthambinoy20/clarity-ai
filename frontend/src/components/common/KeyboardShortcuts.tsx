@@ -12,20 +12,14 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardOutlinedIcon from "@mui/icons-material/KeyboardOutlined";
-import {
-  useKeyboardShortcuts,
-  SHORTCUT_DEFINITIONS,
-} from "@/hooks/useKeyboardShortcuts";
+import { useKeyboardShortcuts, SHORTCUT_DEFINITIONS } from "@/hooks/useKeyboardShortcuts";
 
 interface KeyboardShortcutsProps {
   onAnalyze?: () => void;
   onExport?: () => void;
 }
 
-export default function KeyboardShortcuts({
-  onAnalyze,
-  onExport,
-}: KeyboardShortcutsProps) {
+export default function KeyboardShortcuts({ onAnalyze, onExport }: KeyboardShortcutsProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 

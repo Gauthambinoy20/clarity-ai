@@ -242,7 +242,11 @@ export default function OriginalityScore({ data }: OriginalityScoreProps) {
                     }}
                   />
 
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 0.25, display: "block" }}
+                  >
                     {item.description} (contributes {item.weighted_contribution.toFixed(1)} pts)
                   </Typography>
                 </Box>

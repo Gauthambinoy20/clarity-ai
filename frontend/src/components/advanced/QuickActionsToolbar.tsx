@@ -121,9 +121,11 @@ export default function QuickActionsToolbar({
           await new Promise((r) => setTimeout(r, 1200));
           const demoMessages: Record<string, string> = {
             humanize: "3 flagged sentences have been rewritten with more natural phrasing.",
-            buzzwords: 'Removed 7 AI buzzwords: "utilize", "moreover", "in conclusion", "it is important to note", "significantly", "comprehensive", "facilitate".',
+            buzzwords:
+              'Removed 7 AI buzzwords: "utilize", "moreover", "in conclusion", "it is important to note", "significantly", "comprehensive", "facilitate".',
             grammar: "Fixed 2 grammar issues: subject-verb agreement, comma splice.",
-            readability: "Simplified 4 complex sentences. Reading level improved from Grade 14 to Grade 10.",
+            readability:
+              "Simplified 4 complex sentences. Reading level improved from Grade 14 to Grade 10.",
             report: "PDF report generated and ready for download.",
           };
           setResults((prev) => ({

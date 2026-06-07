@@ -91,11 +91,7 @@ function SimilarityGauge({ score }: { score: number }) {
   );
 }
 
-export default function ComparisonView({
-  data,
-  textA,
-  textB,
-}: ComparisonViewProps) {
+export default function ComparisonView({ data, textA, textB }: ComparisonViewProps) {
   const theme = useTheme();
 
   return (

@@ -48,7 +48,11 @@ interface FinalResult {
   word_count: number;
 }
 
-type WSMessage = SignalResult | ProgressUpdate | FinalResult | { status: string; message?: string; total_signals?: number };
+type WSMessage =
+  | SignalResult
+  | ProgressUpdate
+  | FinalResult
+  | { status: string; message?: string; total_signals?: number };
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -74,9 +78,7 @@ function getClassificationColor(classification: string): string {
 }
 
 function formatSignalName(name: string): string {
-  return name
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 // ---------------------------------------------------------------------------
@@ -242,12 +244,7 @@ export default function RealTimeDetection() {
           Analyze
         </Button>
         {isAnalyzing && (
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<StopIcon />}
-            onClick={handleStop}
-          >
+          <Button variant="outlined" color="error" startIcon={<StopIcon />} onClick={handleStop}>
             Stop
           </Button>
         )}
@@ -346,11 +343,7 @@ export default function RealTimeDetection() {
                           }}
                         />
                       </Box>
-                      <Typography
-                        variant="body1"
-                        fontWeight={700}
-                        sx={{ color }}
-                      >
+                      <Typography variant="body1" fontWeight={700} sx={{ color }}>
                         {isError ? "ERR" : `${Math.round(prob * 100)}%`}
                       </Typography>
                     </Box>
@@ -381,12 +374,10 @@ export default function RealTimeDetection() {
 
       {/* Waiting indicator */}
       {isAnalyzing && signals.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center", py: 3 }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center", py: 3 }}
+          >
             <HourglassEmptyIcon color="action" />
             <Typography variant="body2" color="text.secondary">
               Starting analysis...

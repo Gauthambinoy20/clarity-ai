@@ -31,8 +31,7 @@ export default function PlagiarismPage() {
             Plagiarism Detection
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Check text originality against billions of online sources and academic
-            databases.
+            Check text originality against billions of online sources and academic databases.
           </Typography>
         </Box>
 
@@ -68,9 +67,7 @@ export default function PlagiarismPage() {
           </Card>
         )}
 
-        {plagiarismResult && !isAnalyzing && (
-          <PlagiarismReport result={plagiarismResult} />
-        )}
+        {plagiarismResult && !isAnalyzing && <PlagiarismReport result={plagiarismResult} />}
       </Box>
     </motion.div>
   );

@@ -32,8 +32,7 @@ export default function HumanizePage() {
             AI Text Humanizer
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Transform AI-generated text to bypass detection while preserving
-            original meaning.
+            Transform AI-generated text to bypass detection while preserving original meaning.
           </Typography>
         </Box>
 
@@ -70,11 +69,7 @@ export default function HumanizePage() {
         )}
 
         {humanizationResult && !isAnalyzing && (
-          <HumanizerPanel
-            result={humanizationResult}
-            style={style}
-            onStyleChange={setStyle}
-          />
+          <HumanizerPanel result={humanizationResult} style={style} onStyleChange={setStyle} />
         )}
       </Box>
     </motion.div>

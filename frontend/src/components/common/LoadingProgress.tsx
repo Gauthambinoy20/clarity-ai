@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Stepper,
-  Step,
-  StepLabel,
-  Typography,
-  LinearProgress,
-} from "@mui/material";
+import { Box, Stepper, Step, StepLabel, Typography, LinearProgress } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
 const steps = [

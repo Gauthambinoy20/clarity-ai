@@ -144,9 +144,8 @@ export default function FactChecker({ data }: FactCheckerProps) {
             Fact Verification Report
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {data.claims.length} claims identified.{" "}
-            {data.claims.filter((c) => c.verified).length} verified,{" "}
-            {data.claims.filter((c) => !c.verified).length} unverified.
+            {data.claims.length} claims identified. {data.claims.filter((c) => c.verified).length}{" "}
+            verified, {data.claims.filter((c) => !c.verified).length} unverified.
           </Typography>
 
           {/* Factual Density */}
@@ -185,8 +184,8 @@ export default function FactChecker({ data }: FactCheckerProps) {
         >
           <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
             Found {data.vagueAttributions} unverifiable claim
-            {data.vagueAttributions !== 1 ? "s" : ""} with vague attributions such as
-            "studies show" or "experts say". Consider adding specific citations.
+            {data.vagueAttributions !== 1 ? "s" : ""} with vague attributions such as "studies show"
+            or "experts say". Consider adding specific citations.
           </Alert>
         </motion.div>
       )}
@@ -210,9 +209,7 @@ export default function FactChecker({ data }: FactCheckerProps) {
               sx={{
                 borderLeft: `4px solid ${claim.verified ? "#22c55e" : "#ef4444"}`,
                 backgroundColor:
-                  theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.02)"
-                    : "rgba(0,0,0,0.01)",
+                  theme.palette.mode === "dark" ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.01)",
               }}
             >
               <CardContent sx={{ py: 1.5, "&:last-child": { pb: 1.5 } }}>
@@ -224,13 +221,9 @@ export default function FactChecker({ data }: FactCheckerProps) {
                   }}
                 >
                   {claim.verified ? (
-                    <CheckCircleOutlineIcon
-                      sx={{ color: "#22c55e", fontSize: 20, mt: 0.25 }}
-                    />
+                    <CheckCircleOutlineIcon sx={{ color: "#22c55e", fontSize: 20, mt: 0.25 }} />
                   ) : (
-                    <CancelOutlinedIcon
-                      sx={{ color: "#ef4444", fontSize: 20, mt: 0.25 }}
-                    />
+                    <CancelOutlinedIcon sx={{ color: "#ef4444", fontSize: 20, mt: 0.25 }} />
                   )}
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" sx={{ mb: 1 }}>
@@ -278,9 +271,7 @@ export default function FactChecker({ data }: FactCheckerProps) {
           <Card
             sx={{
               backgroundColor:
-                theme.palette.mode === "dark"
-                  ? "rgba(124,58,237,0.08)"
-                  : "rgba(124,58,237,0.04)",
+                theme.palette.mode === "dark" ? "rgba(124,58,237,0.08)" : "rgba(124,58,237,0.04)",
               border: `1px solid ${theme.palette.divider}`,
             }}
           >
@@ -290,10 +281,7 @@ export default function FactChecker({ data }: FactCheckerProps) {
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <LightbulbOutlinedIcon sx={{ color: "#f59e0b", fontSize: 20 }} />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={tip}
-                    primaryTypographyProps={{ variant: "body2" }}
-                  />
+                  <ListItemText primary={tip} primaryTypographyProps={{ variant: "body2" }} />
                 </ListItem>
               ))}
             </List>

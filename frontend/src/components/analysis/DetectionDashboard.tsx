@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Tabs,
-  Tab,
-  Divider,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, Chip, Tabs, Tab, Divider } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -48,9 +39,7 @@ function getLabelColor(label: string): string {
   }
 }
 
-export default function DetectionDashboard({
-  result,
-}: DetectionDashboardProps) {
+export default function DetectionDashboard({ result }: DetectionDashboardProps) {
   const [bottomTab, setBottomTab] = useState(0);
   const labelColor = getLabelColor(result.label);
 
@@ -79,10 +68,10 @@ export default function DetectionDashboard({
                       result.label === "ai"
                         ? "AI Generated"
                         : result.label === "human"
-                        ? "Human Written"
-                        : result.label === "mixed"
-                        ? "Mixed Content"
-                        : "Uncertain"
+                          ? "Human Written"
+                          : result.label === "mixed"
+                            ? "Mixed Content"
+                            : "Uncertain"
                     }
                   />
                 </Box>
@@ -109,11 +98,7 @@ export default function DetectionDashboard({
 
                   {result.attribution && (
                     <Box>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        gutterBottom
-                      >
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
                         Possible Attribution
                       </Typography>
                       <Typography variant="body2" fontWeight={500}>
@@ -160,11 +145,7 @@ export default function DetectionDashboard({
         {/* Bottom: Heatmap / GLTR tabs */}
         <Card>
           <CardContent>
-            <Tabs
-              value={bottomTab}
-              onChange={(_, v) => setBottomTab(v)}
-              sx={{ mb: 2 }}
-            >
+            <Tabs value={bottomTab} onChange={(_, v) => setBottomTab(v)} sx={{ mb: 2 }}>
               <Tab label="Sentence Heatmap" />
               <Tab label="GLTR Token Analysis" />
             </Tabs>

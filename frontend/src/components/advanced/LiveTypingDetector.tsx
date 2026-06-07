@@ -1,12 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Box,
-  TextField,
-  Typography,
-  alpha,
-  useTheme,
-  Chip,
-} from "@mui/material";
+import { Box, TextField, Typography, alpha, useTheme, Chip } from "@mui/material";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -76,7 +69,11 @@ function MiniSignalBar({ name, score, delay }: { name: string; score: number; de
             }}
           />
         </Box>
-        <Typography variant="caption" fontWeight={700} sx={{ color, width: 30, textAlign: "right" }}>
+        <Typography
+          variant="caption"
+          fontWeight={700}
+          sx={{ color, width: 30, textAlign: "right" }}
+        >
           {pct}%
         </Typography>
       </Box>
@@ -205,7 +202,11 @@ export default function LiveTypingDetector({
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
-                  <Typography variant="body1" fontWeight={800} sx={{ color: scoreColor, lineHeight: 1 }}>
+                  <Typography
+                    variant="body1"
+                    fontWeight={800}
+                    sx={{ color: scoreColor, lineHeight: 1 }}
+                  >
                     {score}
                   </Typography>
                 </motion.div>
@@ -231,11 +232,7 @@ export default function LiveTypingDetector({
         <Box sx={{ flex: 1 }} />
         <AnimatePresence>
           {isAnalyzing && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <Chip
                 icon={
                   <AutorenewIcon
@@ -276,7 +273,12 @@ export default function LiveTypingDetector({
                 background: alpha(theme.palette.background.paper, 0.5),
               }}
             >
-              <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 1, display: "block" }}>
+              <Typography
+                variant="caption"
+                fontWeight={600}
+                color="text.secondary"
+                sx={{ mb: 1, display: "block" }}
+              >
                 Top Signals
               </Typography>
               {signals.map((sig, i) => (

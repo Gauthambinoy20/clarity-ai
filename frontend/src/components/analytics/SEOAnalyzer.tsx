@@ -60,15 +60,7 @@ const priorityColors: Record<string, string> = {
   low: "#22c55e",
 };
 
-function SEOGauge({
-  score,
-  grade,
-  size = 180,
-}: {
-  score: number;
-  grade: string;
-  size?: number;
-}) {
+function SEOGauge({ score, grade, size = 180 }: { score: number; grade: string; size?: number }) {
   const theme = useTheme();
   const radius = (size - 20) / 2;
   const circumference = 2 * Math.PI * radius * 0.75;
@@ -185,8 +177,8 @@ export default function SEOAnalyzer({ data }: SEOAnalyzerProps) {
             SEO Analysis Dashboard
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Your content has been evaluated across readability, keyword usage, structure,
-            and optimization factors.
+            Your content has been evaluated across readability, keyword usage, structure, and
+            optimization factors.
           </Typography>
 
           {/* Metrics Grid */}
@@ -252,10 +244,7 @@ export default function SEOAnalyzer({ data }: SEOAnalyzerProps) {
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 40 }}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={theme.palette.divider}
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                   <XAxis
                     dataKey="keyword"
                     tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -286,10 +275,7 @@ export default function SEOAnalyzer({ data }: SEOAnalyzerProps) {
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {chartData.map((_entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={barColors[index % barColors.length]}
-                      />
+                      <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -352,10 +338,7 @@ export default function SEOAnalyzer({ data }: SEOAnalyzerProps) {
                       }}
                     />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={rec.text}
-                    primaryTypographyProps={{ variant: "body2" }}
-                  />
+                  <ListItemText primary={rec.text} primaryTypographyProps={{ variant: "body2" }} />
                   <Chip
                     label={rec.priority}
                     size="small"

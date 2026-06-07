@@ -179,7 +179,7 @@ export default function ThemeCustomizer({
     <K extends keyof ThemePreferences>(key: K, value: ThemePreferences[K]) => {
       setPrefs((prev) => ({ ...prev, [key]: value }));
     },
-    [],
+    []
   );
 
   const resetDefaults = () => {

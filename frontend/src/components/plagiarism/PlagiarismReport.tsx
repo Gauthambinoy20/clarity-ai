@@ -44,8 +44,8 @@ export default function PlagiarismReport({ result }: PlagiarismReportProps) {
                 result.originalityScore >= 80
                   ? "Highly Original"
                   : result.originalityScore >= 60
-                  ? "Mostly Original"
-                  : "Significant Matches Found"
+                    ? "Mostly Original"
+                    : "Significant Matches Found"
               }
             />
             <Typography
@@ -93,14 +93,10 @@ export default function PlagiarismReport({ result }: PlagiarismReportProps) {
                             para.score > 40
                               ? "#ef444420"
                               : para.score > 20
-                              ? "#f59e0b20"
-                              : "#22c55e20",
+                                ? "#f59e0b20"
+                                : "#22c55e20",
                           color:
-                            para.score > 40
-                              ? "#ef4444"
-                              : para.score > 20
-                              ? "#f59e0b"
-                              : "#22c55e",
+                            para.score > 40 ? "#ef4444" : para.score > 20 ? "#f59e0b" : "#22c55e",
                           fontWeight: 600,
                         }}
                       />
@@ -116,11 +112,7 @@ export default function PlagiarismReport({ result }: PlagiarismReportProps) {
                         "& .MuiLinearProgress-bar": {
                           borderRadius: 3,
                           backgroundColor:
-                            para.score > 40
-                              ? "#ef4444"
-                              : para.score > 20
-                              ? "#f59e0b"
-                              : "#22c55e",
+                            para.score > 40 ? "#ef4444" : para.score > 20 ? "#f59e0b" : "#22c55e",
                         },
                       }}
                     />
@@ -137,9 +129,7 @@ export default function PlagiarismReport({ result }: PlagiarismReportProps) {
                       {para.text}
                     </Typography>
                   </Box>
-                  {index < result.paragraphs.length - 1 && (
-                    <Divider sx={{ mt: 2 }} />
-                  )}
+                  {index < result.paragraphs.length - 1 && <Divider sx={{ mt: 2 }} />}
                 </motion.div>
               ))}
             </Box>
@@ -180,8 +170,8 @@ export default function PlagiarismReport({ result }: PlagiarismReportProps) {
                           source.similarity > 0.7
                             ? "error"
                             : source.similarity > 0.4
-                            ? "warning"
-                            : "success"
+                              ? "warning"
+                              : "success"
                         }
                       />
                       <Typography variant="body2" fontWeight={500} noWrap>
@@ -198,16 +188,10 @@ export default function PlagiarismReport({ result }: PlagiarismReportProps) {
                         mb: 1.5,
                       }}
                     >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        gutterBottom
-                      >
+                      <Typography variant="caption" color="text.secondary" gutterBottom>
                         Matched text:
                       </Typography>
-                      <Typography variant="body2">
-                        {source.matchedText}
-                      </Typography>
+                      <Typography variant="body2">{source.matchedText}</Typography>
                     </Box>
                     <Link
                       href={source.url}

@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Typography,
-  Popover,
-  Card,
-  CardContent,
-  LinearProgress,
-} from "@mui/material";
+import { Box, Typography, Popover, Card, CardContent, LinearProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import type { SentenceScore } from "@/types/analysis";
 
@@ -26,10 +19,7 @@ export default function SentenceHeatmap({ sentences }: SentenceHeatmapProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selected, setSelected] = useState<SentenceScore | null>(null);
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLElement>,
-    sentence: SentenceScore
-  ) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>, sentence: SentenceScore) => {
     setAnchorEl(event.currentTarget);
     setSelected(sentence);
   };
@@ -44,7 +34,13 @@ export default function SentenceHeatmap({ sentences }: SentenceHeatmapProps) {
       <Typography variant="h6" gutterBottom>
         Sentence Heatmap
       </Typography>
-      <Typography variant="caption" color="text.secondary" gutterBottom display="block" sx={{ mb: 2 }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        gutterBottom
+        display="block"
+        sx={{ mb: 2 }}
+      >
         Click any sentence for detailed scores. Green = human, Red = AI.
       </Typography>
 
@@ -75,9 +71,7 @@ export default function SentenceHeatmap({ sentences }: SentenceHeatmapProps) {
               whileHover={{
                 backgroundColor: `${color}45`,
               }}
-              onClick={(e: React.MouseEvent<HTMLElement>) =>
-                handleClick(e, sentence)
-              }
+              onClick={(e: React.MouseEvent<HTMLElement>) => handleClick(e, sentence)}
             >
               {sentence.text}
             </motion.span>

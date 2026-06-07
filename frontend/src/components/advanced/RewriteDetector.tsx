@@ -47,8 +47,7 @@ function NaturalnessGauge({ score, size = 120 }: { score: number; size?: number 
   const radius = (size - 16) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
-  const color =
-    score >= 70 ? "#22c55e" : score >= 40 ? "#f59e0b" : "#ef4444";
+  const color = score >= 70 ? "#22c55e" : score >= 40 ? "#f59e0b" : "#ef4444";
 
   return (
     <Box sx={{ position: "relative", width: size, height: size }}>
@@ -147,7 +146,9 @@ export default function RewriteDetector({ result, isLoading }: RewriteDetectorPr
       >
         <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
           {/* Header Badge */}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}
+          >
             <Chip
               icon={badgeIcon}
               label={badgeLabel}

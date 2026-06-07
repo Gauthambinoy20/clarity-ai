@@ -29,16 +29,11 @@ interface HumanizerPanelProps {
   onStyleChange: (style: string) => void;
 }
 
-export default function HumanizerPanel({
-  result,
-  style,
-  onStyleChange,
-}: HumanizerPanelProps) {
+export default function HumanizerPanel({ result, style, onStyleChange }: HumanizerPanelProps) {
   const theme = useTheme();
 
   const scoreDrop = result.originalScore - result.humanizedScore;
-  const scoreDropColor =
-    scoreDrop > 40 ? "#22c55e" : scoreDrop > 20 ? "#f59e0b" : "#ef4444";
+  const scoreDropColor = scoreDrop > 40 ? "#22c55e" : scoreDrop > 20 ? "#f59e0b" : "#ef4444";
 
   return (
     <motion.div
@@ -103,18 +98,10 @@ export default function HumanizerPanel({
                 <Typography variant="caption" color="text.secondary">
                   Score Reduction
                 </Typography>
-                <Typography
-                  variant="h4"
-                  fontWeight={700}
-                  sx={{ color: scoreDropColor }}
-                >
+                <Typography variant="h4" fontWeight={700} sx={{ color: scoreDropColor }}>
                   -{Math.round(scoreDrop)}
                 </Typography>
-                <Chip
-                  label={`${result.iterations} iterations`}
-                  size="small"
-                  variant="outlined"
-                />
+                <Chip label={`${result.iterations} iterations`} size="small" variant="outlined" />
               </CardContent>
             </Card>
           </Grid>
@@ -130,9 +117,7 @@ export default function HumanizerPanel({
                 mb: 1,
               }}
             >
-              <Typography variant="subtitle2">
-                Meaning Preservation
-              </Typography>
+              <Typography variant="subtitle2">Meaning Preservation</Typography>
               <Typography variant="subtitle2" fontWeight={700}>
                 {Math.round(result.meaningPreservation * 100)}%
               </Typography>
@@ -166,10 +151,7 @@ export default function HumanizerPanel({
               <Box sx={{ width: "100%", height: 250 }}>
                 <ResponsiveContainer>
                   <LineChart data={result.scoreTimeline}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={theme.palette.divider}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                     <XAxis
                       dataKey="iteration"
                       tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
@@ -227,12 +209,7 @@ export default function HumanizerPanel({
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box>
-                  <Chip
-                    label="Original"
-                    color="error"
-                    size="small"
-                    sx={{ mb: 1.5 }}
-                  />
+                  <Chip label="Original" color="error" size="small" sx={{ mb: 1.5 }} />
                   <Typography
                     variant="body2"
                     sx={{
@@ -253,12 +230,7 @@ export default function HumanizerPanel({
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box>
-                  <Chip
-                    label="Humanized"
-                    color="success"
-                    size="small"
-                    sx={{ mb: 1.5 }}
-                  />
+                  <Chip label="Humanized" color="success" size="small" sx={{ mb: 1.5 }} />
                   <Typography
                     variant="body2"
                     sx={{

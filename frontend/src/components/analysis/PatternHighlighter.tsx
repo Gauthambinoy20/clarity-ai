@@ -1,14 +1,5 @@
 import { useState, useMemo } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Paper,
-  Tooltip,
-  Divider,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, Chip, Paper, Tooltip, Divider } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ---------------------------------------------------------------------------
@@ -60,11 +51,36 @@ const CATEGORY_STYLES: Record<string, { color: string; label: string; bgColor: s
 
 // Group mappings for the legend
 const LEGEND_GROUPS: { key: string; label: string; color: string; description: string }[] = [
-  { key: "buzzword", label: "AI Buzzwords", color: "#f97316", description: "Phrases frequently overused by AI models" },
-  { key: "transition", label: "Transitions", color: "#3b82f6", description: "Formulaic transition phrases AI overuses" },
-  { key: "opening", label: "Openings", color: "#a855f7", description: "Common AI opening sentence patterns" },
-  { key: "closing", label: "Closings", color: "#ef4444", description: "Typical AI closing/summary patterns" },
-  { key: "hedging", label: "Hedging", color: "#eab308", description: "Hedging language and qualifiers" },
+  {
+    key: "buzzword",
+    label: "AI Buzzwords",
+    color: "#f97316",
+    description: "Phrases frequently overused by AI models",
+  },
+  {
+    key: "transition",
+    label: "Transitions",
+    color: "#3b82f6",
+    description: "Formulaic transition phrases AI overuses",
+  },
+  {
+    key: "opening",
+    label: "Openings",
+    color: "#a855f7",
+    description: "Common AI opening sentence patterns",
+  },
+  {
+    key: "closing",
+    label: "Closings",
+    color: "#ef4444",
+    description: "Typical AI closing/summary patterns",
+  },
+  {
+    key: "hedging",
+    label: "Hedging",
+    color: "#eab308",
+    description: "Hedging language and qualifiers",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -81,7 +97,7 @@ interface HighlightSpan {
 function buildHighlightSpans(
   text: string,
   patternCategories: Record<string, PatternCategory>,
-  phraseMatches?: Record<string, string[]>,
+  phraseMatches?: Record<string, string[]>
 ): HighlightSpan[] {
   const spans: HighlightSpan[] = [];
   const lowerText = text.toLowerCase();
@@ -149,7 +165,7 @@ export default function PatternHighlighter({ text, data }: PatternHighlighterPro
 
   const spans = useMemo(
     () => buildHighlightSpans(text, data.pattern_categories, data.phrase_matches),
-    [text, data.pattern_categories, data.phrase_matches],
+    [text, data.pattern_categories, data.phrase_matches]
   );
 
   // Count per category
@@ -176,11 +192,7 @@ export default function PatternHighlighter({ text, data }: PatternHighlighterPro
 
       // Text before this span
       if (span.start > lastEnd) {
-        elements.push(
-          <span key={`text-${i}`}>
-            {text.substring(lastEnd, span.start)}
-          </span>,
-        );
+        elements.push(<span key={`text-${i}`}>{text.substring(lastEnd, span.start)}</span>);
       }
 
       // The category style
@@ -222,7 +234,7 @@ export default function PatternHighlighter({ text, data }: PatternHighlighterPro
           >
             {text.substring(span.start, span.end)}
           </span>
-        </Tooltip>,
+        </Tooltip>
       );
 
       lastEnd = span.end;
@@ -230,9 +242,7 @@ export default function PatternHighlighter({ text, data }: PatternHighlighterPro
 
     // Text after last span
     if (lastEnd < text.length) {
-      elements.push(
-        <span key="text-end">{text.substring(lastEnd)}</span>,
-      );
+      elements.push(<span key="text-end">{text.substring(lastEnd)}</span>);
     }
 
     return elements;
@@ -248,15 +258,14 @@ export default function PatternHighlighter({ text, data }: PatternHighlighterPro
           <Chip
             label={`${data.patterns_found} patterns found`}
             size="small"
-            color={data.patterns_found > 10 ? "error" : data.patterns_found > 5 ? "warning" : "success"}
+            color={
+              data.patterns_found > 10 ? "error" : data.patterns_found > 5 ? "warning" : "success"
+            }
           />
         </Box>
 
         {/* Legend */}
-        <Paper
-          variant="outlined"
-          sx={{ p: 1.5, mb: 2, display: "flex", flexWrap: "wrap", gap: 1 }}
-        >
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
           {LEGEND_GROUPS.map((group) => {
             const count = categoryCounts[group.key] || 0;
             const isActive = selectedCategory === group.key;
@@ -292,9 +301,7 @@ export default function PatternHighlighter({ text, data }: PatternHighlighterPro
                   }
                   size="small"
                   variant={isActive ? "filled" : "outlined"}
-                  onClick={() =>
-                    setSelectedCategory(isActive ? null : group.key)
-                  }
+                  onClick={() => setSelectedCategory(isActive ? null : group.key)}
                   sx={{
                     cursor: "pointer",
                     borderColor: isActive ? group.color : undefined,

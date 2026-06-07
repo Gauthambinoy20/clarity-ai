@@ -1,10 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import ShortTextOutlinedIcon from "@mui/icons-material/ShortTextOutlined";
@@ -73,11 +67,7 @@ function MetricCard({ icon, label, value, subtitle, delay = 0 }: MetricCardProps
               {label}
             </Typography>
             {subtitle && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ fontSize: "0.65rem" }}
-              >
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem" }}>
                 {subtitle}
               </Typography>
             )}
@@ -148,10 +138,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                 <Box sx={{ width: "100%", height: 260, mt: 1 }}>
                   <ResponsiveContainer>
                     <BarChart data={data.word_length_distribution}>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke={theme.palette.divider}
-                      />
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                       <XAxis
                         dataKey="length"
                         tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -163,9 +150,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                           fill: theme.palette.text.secondary,
                         }}
                       />
-                      <YAxis
-                        tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-                      />
+                      <YAxis tick={{ fontSize: 11, fill: theme.palette.text.secondary }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: theme.palette.background.paper,
@@ -195,10 +180,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                 <Box sx={{ width: "100%", height: 260, mt: 1 }}>
                   <ResponsiveContainer>
                     <BarChart data={data.sentence_length_distribution}>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke={theme.palette.divider}
-                      />
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                       <XAxis
                         dataKey="length"
                         tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -210,9 +192,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                           fill: theme.palette.text.secondary,
                         }}
                       />
-                      <YAxis
-                        tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-                      />
+                      <YAxis tick={{ fontSize: 11, fill: theme.palette.text.secondary }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: theme.palette.background.paper,
@@ -255,10 +235,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                         nameKey="label"
                       >
                         {data.pos_distribution.map((_, index) => (
-                          <Cell
-                            key={index}
-                            fill={POS_COLORS[index % POS_COLORS.length]}
-                          />
+                          <Cell key={index} fill={POS_COLORS[index % POS_COLORS.length]} />
                         ))}
                       </Pie>
                       <Tooltip
@@ -290,10 +267,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                       layout="vertical"
                       margin={{ top: 5, right: 20, left: 60, bottom: 5 }}
                     >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke={theme.palette.divider}
-                      />
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                       <XAxis
                         type="number"
                         tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -313,10 +287,7 @@ export default function TextStatisticsPanel({ data }: TextStatisticsPanelProps) 
                       />
                       <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                         {topWords.map((_, index) => (
-                          <Cell
-                            key={index}
-                            fill={POS_COLORS[index % POS_COLORS.length]}
-                          />
+                          <Cell key={index} fill={POS_COLORS[index % POS_COLORS.length]} />
                         ))}
                       </Bar>
                     </BarChart>

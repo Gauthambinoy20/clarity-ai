@@ -80,9 +80,7 @@ export const useAppStore = create<AppState>()(
         })),
       markNotificationRead: (id) =>
         set((state) => ({
-          notifications: state.notifications.map((n) =>
-            n.id === id ? { ...n, read: true } : n
-          ),
+          notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
         })),
       clearNotifications: () => set({ notifications: [] }),
       removeNotification: (id) =>

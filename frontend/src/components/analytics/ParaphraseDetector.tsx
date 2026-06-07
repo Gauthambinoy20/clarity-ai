@@ -129,11 +129,7 @@ export default function ParaphraseDetector({ data }: ParaphraseDetectorProps) {
               : " No repetitive sentences detected."}
           </Typography>
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            <Chip
-              size="small"
-              label={`${data.totalSentences} sentences`}
-              variant="outlined"
-            />
+            <Chip size="small" label={`${data.totalSentences} sentences`} variant="outlined" />
             <Chip
               size="small"
               label={`${data.flaggedPairs.filter((p) => p.similarity >= 0.9).length} self-plagiarism`}
@@ -268,8 +264,8 @@ export default function ParaphraseDetector({ data }: ParaphraseDetectorProps) {
               cluster.avgSimilarity >= 0.9
                 ? "#ef4444"
                 : cluster.avgSimilarity >= 0.8
-                ? "#f59e0b"
-                : "#22c55e";
+                  ? "#f59e0b"
+                  : "#22c55e";
             return (
               <motion.div
                 key={cluster.label}

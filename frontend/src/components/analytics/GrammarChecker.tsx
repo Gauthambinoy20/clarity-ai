@@ -67,15 +67,7 @@ const PIE_COLORS = [
   "#6366f1",
 ];
 
-function ScoreGauge({
-  score,
-  label,
-  delay = 0,
-}: {
-  score: number;
-  label: string;
-  delay?: number;
-}) {
+function ScoreGauge({ score, label, delay = 0 }: { score: number; label: string; delay?: number }) {
   const theme = useTheme();
   const size = 120;
   const strokeWidth = 10;
@@ -147,10 +139,7 @@ function ScoreGauge({
   );
 }
 
-export default function GrammarChecker({
-  data,
-  onAcceptSuggestion,
-}: GrammarCheckerProps) {
+export default function GrammarChecker({ data, onAcceptSuggestion }: GrammarCheckerProps) {
   const theme = useTheme();
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
@@ -162,9 +151,10 @@ export default function GrammarChecker({
     [onAcceptSuggestion]
   );
 
-  const categoryData = Object.entries(data.category_counts).map(
-    ([name, value]) => ({ name, value })
-  );
+  const categoryData = Object.entries(data.category_counts).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
   const visibleErrors = data.errors.filter((e) => !dismissedIds.has(e.id));
 
@@ -245,10 +235,7 @@ export default function GrammarChecker({
                         dataKey="value"
                       >
                         {categoryData.map((_, index) => (
-                          <Cell
-                            key={index}
-                            fill={PIE_COLORS[index % PIE_COLORS.length]}
-                          />
+                          <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                         ))}
                       </Pie>
                       <RechartsTooltip
@@ -258,9 +245,7 @@ export default function GrammarChecker({
                           borderRadius: 8,
                         }}
                       />
-                      <Legend
-                        wrapperStyle={{ fontSize: 12 }}
-                      />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </Box>
@@ -323,11 +308,7 @@ export default function GrammarChecker({
                             }}
                           >
                             <Box sx={{ color: config.color }}>{config.icon}</Box>
-                            <Typography
-                              variant="body2"
-                              fontWeight={600}
-                              sx={{ flex: 1 }}
-                            >
+                            <Typography variant="body2" fontWeight={600} sx={{ flex: 1 }}>
                               {error.message}
                             </Typography>
                             <Chip
@@ -405,12 +386,8 @@ export default function GrammarChecker({
                       textAlign: "center",
                     }}
                   >
-                    <CheckCircleOutlineIcon
-                      sx={{ fontSize: 40, color: "success.main", mb: 1 }}
-                    />
-                    <Typography color="text.secondary">
-                      All issues resolved!
-                    </Typography>
+                    <CheckCircleOutlineIcon sx={{ fontSize: 40, color: "success.main", mb: 1 }} />
+                    <Typography color="text.secondary">All issues resolved!</Typography>
                   </Box>
                 )}
               </List>

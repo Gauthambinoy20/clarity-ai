@@ -82,10 +82,7 @@ export default function TextInput({
             {charCount} chars
           </Typography>
           {wordCount > 0 && !isMinWords && (
-            <motion.div
-              initial={{ opacity: 0, x: -5 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
+            <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }}>
               <Chip
                 label={`${50 - wordCount} more words needed`}
                 size="small"

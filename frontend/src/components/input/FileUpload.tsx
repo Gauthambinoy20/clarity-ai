@@ -26,18 +26,16 @@ export default function FileUpload({ onFileContent, disabled }: FileUploadProps)
     [onFileContent]
   );
 
-  const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
-    useDropzone({
-      onDrop,
-      accept: {
-        "text/plain": [".txt"],
-        "application/pdf": [".pdf"],
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          [".docx"],
-      },
-      maxFiles: 1,
-      disabled,
-    });
+  const { getRootProps, getInputProps, isDragActive, acceptedFiles } = useDropzone({
+    onDrop,
+    accept: {
+      "text/plain": [".txt"],
+      "application/pdf": [".pdf"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+    },
+    maxFiles: 1,
+    disabled,
+  });
 
   return (
     // motion lives on a wrapper div: spreading dropzone's root props onto a
@@ -46,47 +44,45 @@ export default function FileUpload({ onFileContent, disabled }: FileUploadProps)
       whileHover={disabled ? {} : { scale: 1.01 }}
       whileTap={disabled ? {} : { scale: 0.99 }}
     >
-    <Card
-      {...getRootProps()}
-      sx={{
-        p: 4,
-        textAlign: "center",
-        cursor: disabled ? "default" : "pointer",
-        border: "2px dashed",
-        borderColor: isDragActive ? "primary.main" : "divider",
-        backgroundColor: isDragActive ? "primary.main" : "transparent",
-        opacity: disabled ? 0.5 : 1,
-        transition: "all 0.2s ease",
-        "&:hover": disabled
-          ? {}
-          : {
-              borderColor: "primary.light",
-            },
-      }}
-    >
-      <input {...getInputProps()} />
+      <Card
+        {...getRootProps()}
+        sx={{
+          p: 4,
+          textAlign: "center",
+          cursor: disabled ? "default" : "pointer",
+          border: "2px dashed",
+          borderColor: isDragActive ? "primary.main" : "divider",
+          backgroundColor: isDragActive ? "primary.main" : "transparent",
+          opacity: disabled ? 0.5 : 1,
+          transition: "all 0.2s ease",
+          "&:hover": disabled
+            ? {}
+            : {
+                borderColor: "primary.light",
+              },
+        }}
+      >
+        <input {...getInputProps()} />
 
-      {acceptedFiles.length > 0 ? (
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
-          <InsertDriveFileOutlinedIcon color="primary" />
-          <Typography variant="body2" fontWeight={500}>
-            {acceptedFiles[0].name}
-          </Typography>
-        </Box>
-      ) : (
-        <>
-          <CloudUploadOutlinedIcon
-            sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
-          />
-          <Typography variant="body1" fontWeight={500} gutterBottom>
-            {isDragActive ? "Drop file here" : "Drag & drop a file"}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Supports PDF, DOCX, TXT
-          </Typography>
-        </>
-      )}
-    </Card>
+        {acceptedFiles.length > 0 ? (
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
+            <InsertDriveFileOutlinedIcon color="primary" />
+            <Typography variant="body2" fontWeight={500}>
+              {acceptedFiles[0].name}
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <CloudUploadOutlinedIcon sx={{ fontSize: 48, color: "text.secondary", mb: 1 }} />
+            <Typography variant="body1" fontWeight={500} gutterBottom>
+              {isDragActive ? "Drop file here" : "Drag & drop a file"}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Supports PDF, DOCX, TXT
+            </Typography>
+          </>
+        )}
+      </Card>
     </motion.div>
   );
 }

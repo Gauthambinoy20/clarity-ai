@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  LinearProgress,
-  useTheme,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, Chip, LinearProgress, useTheme } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { motion } from "framer-motion";
 import type { ToneResult } from "@/types/analytics";
@@ -210,8 +202,7 @@ export default function ToneAnalyzer({ data }: ToneAnalyzerProps) {
                         sx={{
                           fontWeight: 600,
                           backgroundColor:
-                            emotionColors[em.emotion.toLowerCase()] ||
-                            theme.palette.primary.main,
+                            emotionColors[em.emotion.toLowerCase()] || theme.palette.primary.main,
                           color: "#fff",
                           opacity: 0.5 + em.score * 0.5,
                         }}

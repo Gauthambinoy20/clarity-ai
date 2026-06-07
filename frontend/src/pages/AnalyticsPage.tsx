@@ -127,8 +127,8 @@ export default function AnalyticsPage() {
             Text Analytics
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Comprehensive writing analysis including readability, tone, grammar,
-            statistics, and suggestions.
+            Comprehensive writing analysis including readability, tone, grammar, statistics, and
+            suggestions.
           </Typography>
         </Box>
 
@@ -170,10 +170,7 @@ export default function AnalyticsPage() {
                   {text.length} chars
                 </Typography>
                 {wordCount > 0 && !isMinWords && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -5 }}
-                    animate={{ opacity: 1, x: 0 }}
-                  >
+                  <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }}>
                     <Chip
                       label={`${50 - wordCount} more words needed`}
                       size="small"
@@ -186,10 +183,7 @@ export default function AnalyticsPage() {
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                 {result && (
-                  <ExportMenu
-                    data={result as unknown as Record<string, unknown>}
-                    text={text}
-                  />
+                  <ExportMenu data={result as unknown as Record<string, unknown>} text={text} />
                 )}
                 <Button
                   variant="contained"
@@ -203,12 +197,10 @@ export default function AnalyticsPage() {
                     )
                   }
                   sx={{
-                    background:
-                      "linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%)",
+                    background: "linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%)",
                     color: "#fff",
                     "&:hover": {
-                      background:
-                        "linear-gradient(135deg, #6d28d9 0%, #0891b2 100%)",
+                      background: "linear-gradient(135deg, #6d28d9 0%, #0891b2 100%)",
                     },
                     "&.Mui-disabled": {
                       background: "action.disabledBackground",

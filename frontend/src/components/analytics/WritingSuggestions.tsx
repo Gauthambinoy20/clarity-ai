@@ -20,10 +20,7 @@ interface WritingSuggestionsProps {
   data: WritingSuggestionsResult;
 }
 
-const categoryConfig: Record<
-  string,
-  { label: string; color: string; icon: string }
-> = {
+const categoryConfig: Record<string, { label: string; color: string; icon: string }> = {
   clarity: { label: "Clarity", color: "#7c3aed", icon: "visibility" },
   conciseness: { label: "Conciseness", color: "#06b6d4", icon: "compress" },
   engagement: { label: "Engagement", color: "#22c55e", icon: "thumb_up" },
@@ -109,13 +106,7 @@ function ScoreGauge({ score, delay = 0 }: { score: number; delay?: number }) {
   );
 }
 
-function SuggestionCard({
-  suggestion,
-  index,
-}: {
-  suggestion: WritingSuggestion;
-  index: number;
-}) {
+function SuggestionCard({ suggestion, index }: { suggestion: WritingSuggestion; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -180,9 +171,7 @@ function SuggestionCard({
             </Typography>
             {suggestion.suggested && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <ArrowForwardIcon
-                  sx={{ fontSize: 14, color: "success.main" }}
-                />
+                <ArrowForwardIcon sx={{ fontSize: 14, color: "success.main" }} />
                 <Typography
                   variant="body2"
                   sx={{
@@ -219,14 +208,11 @@ function SuggestionCard({
 }
 
 export default function WritingSuggestions({ data }: WritingSuggestionsProps) {
-  const grouped = data.suggestions.reduce<Record<string, WritingSuggestion[]>>(
-    (acc, s) => {
-      if (!acc[s.category]) acc[s.category] = [];
-      acc[s.category].push(s);
-      return acc;
-    },
-    {}
-  );
+  const grouped = data.suggestions.reduce<Record<string, WritingSuggestion[]>>((acc, s) => {
+    if (!acc[s.category]) acc[s.category] = [];
+    acc[s.category].push(s);
+    return acc;
+  }, {});
 
   const categories = Object.keys(categoryConfig);
 
@@ -294,10 +280,7 @@ export default function WritingSuggestions({ data }: WritingSuggestionsProps) {
                     overflow: "hidden",
                   }}
                 >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    sx={{ px: 3 }}
-                  >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 3 }}>
                     <Box
                       sx={{
                         display: "flex",

@@ -78,7 +78,7 @@ function SimpleQRCode({ value, size = 160 }: { value: string; size?: number }) {
         } else {
           // Pseudo-random data pattern
           const seed = (hash + row * 31 + col * 17) & 0xffffffff;
-          grid[row][col] = (seed % 3) !== 0;
+          grid[row][col] = seed % 3 !== 0;
         }
       }
     }
@@ -368,7 +368,8 @@ export default function ShareAnalysis({
             }}
           >
             Anyone with this link can view the analysis results.
-            {expiry !== "never" && ` This link will expire in ${expiryLabels[expiry].toLowerCase()}.`}
+            {expiry !== "never" &&
+              ` This link will expire in ${expiryLabels[expiry].toLowerCase()}.`}
           </Alert>
         </DialogContent>
 

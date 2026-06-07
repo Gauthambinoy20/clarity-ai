@@ -108,8 +108,7 @@ export default function CitationChecker({ data }: CitationCheckerProps) {
                   size="small"
                   sx={{
                     fontWeight: 700,
-                    backgroundColor:
-                      data.invalid_count > 0 ? "error.main" : "success.main",
+                    backgroundColor: data.invalid_count > 0 ? "error.main" : "success.main",
                     color: "#fff",
                   }}
                 />
@@ -139,8 +138,8 @@ export default function CitationChecker({ data }: CitationCheckerProps) {
                       data.format_consistency_score >= 80
                         ? "success.main"
                         : data.format_consistency_score >= 50
-                        ? "warning.main"
-                        : "error.main",
+                          ? "warning.main"
+                          : "error.main",
                   },
                 }}
               />
@@ -156,12 +155,8 @@ export default function CitationChecker({ data }: CitationCheckerProps) {
             </Typography>
             {data.citations.length === 0 ? (
               <Box sx={{ textAlign: "center", py: 4 }}>
-                <FormatQuoteOutlinedIcon
-                  sx={{ fontSize: 48, color: "text.disabled", mb: 1 }}
-                />
-                <Typography color="text.secondary">
-                  No citations detected in the text.
-                </Typography>
+                <FormatQuoteOutlinedIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
+                <Typography color="text.secondary">No citations detected in the text.</Typography>
               </Box>
             ) : (
               <List>
@@ -177,9 +172,7 @@ export default function CitationChecker({ data }: CitationCheckerProps) {
                         mb: 1,
                         borderRadius: 2,
                         border: "1px solid",
-                        borderColor: citation.is_valid
-                          ? "success.main"
-                          : "error.main",
+                        borderColor: citation.is_valid ? "success.main" : "error.main",
                         backgroundColor: citation.is_valid
                           ? "rgba(34,197,94,0.05)"
                           : "rgba(239,68,68,0.05)",
@@ -187,9 +180,7 @@ export default function CitationChecker({ data }: CitationCheckerProps) {
                     >
                       <ListItemIcon sx={{ minWidth: 40 }}>
                         {citation.is_valid ? (
-                          <CheckCircleOutlinedIcon
-                            sx={{ color: "success.main" }}
-                          />
+                          <CheckCircleOutlinedIcon sx={{ color: "success.main" }} />
                         ) : (
                           <CancelOutlinedIcon sx={{ color: "error.main" }} />
                         )}
@@ -272,11 +263,7 @@ export default function CitationChecker({ data }: CitationCheckerProps) {
                 Citation Issues
               </Typography>
               {data.issues.map((issue, i) => (
-                <Alert
-                  key={i}
-                  severity="info"
-                  sx={{ mb: 1, borderRadius: 2 }}
-                >
+                <Alert key={i} severity="info" sx={{ mb: 1, borderRadius: 2 }}>
                   {issue}
                 </Alert>
               ))}
