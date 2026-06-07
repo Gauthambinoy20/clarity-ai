@@ -149,12 +149,25 @@ class PlagiarismPipeline:
                 source_content = st["content"]
                 source_meta = st["meta"]
 
-                # Exact match
-                exact_result = exact_matcher.compare(paragraph, source_content)
+                # A failing comparison stage degrades to "no evidence from
+                # this stage" — one bad source or a broken model must not
+                # abort the whole analysis.
+                try:
+                    exact_result = exact_matcher.compare(paragraph, source_content)
+                except Exception as exc:
+                    logger.warning(
+                        "exact match failed for %s: %s", source_meta.get("url", "?"), exc
+                    )
+                    exact_result = {}
                 exact_overlap = exact_result.get("overlap_score", 0.0)
 
-                # Semantic match
-                semantic_result = semantic_matcher.compare(paragraph, source_content)
+                try:
+                    semantic_result = semantic_matcher.compare(paragraph, source_content)
+                except Exception as exc:
+                    logger.warning(
+                        "semantic match failed for %s: %s", source_meta.get("url", "?"), exc
+                    )
+                    semantic_result = {}
                 semantic_sim = semantic_result.get("overall_semantic_similarity", 0.0)
                 flagged_ratio = semantic_result.get("flagged_sentence_ratio", 0.0)
 
