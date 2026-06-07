@@ -100,12 +100,12 @@ export default function ComparePage() {
       <Box sx={{ maxWidth: 1200, mx: "auto" }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
             Text Comparison
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Compare two texts side by side. Analyze similarity, structural
-            differences, and run AI detection on both.
+            Compare two texts side by side. Analyze similarity, structural differences, and run AI
+            detection on both.
           </Typography>
         </Box>
 
@@ -122,7 +122,12 @@ export default function ComparePage() {
                     mb: 1.5,
                   }}
                 >
-                  <Typography variant="subtitle2" fontWeight={600} color="primary.main">
+                  <Typography
+                    variant="subtitle2"
+                    component="p"
+                    fontWeight={600}
+                    color="primary.main"
+                  >
                     Text A
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -159,7 +164,12 @@ export default function ComparePage() {
                     mb: 1.5,
                   }}
                 >
-                  <Typography variant="subtitle2" fontWeight={600} color="secondary.main">
+                  <Typography
+                    variant="subtitle2"
+                    component="p"
+                    fontWeight={600}
+                    color="secondary.main"
+                  >
                     Text B
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -273,7 +283,7 @@ export default function ComparePage() {
             >
               <Card sx={{ mb: 3 }}>
                 <CardContent>
-                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                  <Typography variant="subtitle2" component="p" fontWeight={600} gutterBottom>
                     AI Detection Results
                   </Typography>
                   <Grid container spacing={3} sx={{ mt: 0.5 }}>
@@ -287,17 +297,14 @@ export default function ComparePage() {
                           textAlign: "center",
                         }}
                       >
-                        <Typography
-                          variant="caption"
-                          fontWeight={600}
-                          color="primary.main"
-                        >
+                        <Typography variant="caption" fontWeight={600} color="primary.main">
                           Text A
                         </Typography>
                         {detectionA ? (
                           <>
                             <Typography
                               variant="h3"
+                              component="p"
                               fontWeight={800}
                               sx={{
                                 mt: 1,
@@ -312,19 +319,13 @@ export default function ComparePage() {
                               sx={{
                                 mt: 0.5,
                                 fontWeight: 600,
-                                backgroundColor: getScoreColor(
-                                  detectionA.overallScore
-                                ),
+                                backgroundColor: getScoreColor(detectionA.overallScore),
                                 color: "#fff",
                               }}
                             />
                           </>
                         ) : (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 2 }}
-                          >
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                             Not analyzed yet
                           </Typography>
                         )}
@@ -340,17 +341,14 @@ export default function ComparePage() {
                           textAlign: "center",
                         }}
                       >
-                        <Typography
-                          variant="caption"
-                          fontWeight={600}
-                          color="secondary.main"
-                        >
+                        <Typography variant="caption" fontWeight={600} color="secondary.main">
                           Text B
                         </Typography>
                         {detectionB ? (
                           <>
                             <Typography
                               variant="h3"
+                              component="p"
                               fontWeight={800}
                               sx={{
                                 mt: 1,
@@ -365,19 +363,13 @@ export default function ComparePage() {
                               sx={{
                                 mt: 0.5,
                                 fontWeight: 600,
-                                backgroundColor: getScoreColor(
-                                  detectionB.overallScore
-                                ),
+                                backgroundColor: getScoreColor(detectionB.overallScore),
                                 color: "#fff",
                               }}
                             />
                           </>
                         ) : (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 2 }}
-                          >
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                             Not analyzed yet
                           </Typography>
                         )}
@@ -399,11 +391,7 @@ export default function ComparePage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <ComparisonView
-                data={comparisonResult}
-                textA={textA}
-                textB={textB}
-              />
+              <ComparisonView data={comparisonResult} textA={textA} textB={textB} />
             </motion.div>
           )}
         </AnimatePresence>

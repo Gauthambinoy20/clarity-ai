@@ -36,11 +36,7 @@ import {
   Cell,
   CartesianGrid,
 } from "recharts";
-import {
-  getDashboardStats,
-  getDashboardTrends,
-  getTopSignals,
-} from "@/utils/api";
+import { getDashboardStats, getDashboardTrends, getTopSignals } from "@/utils/api";
 import type { DashboardStats, DashboardTrends, TopSignal } from "@/types/analytics";
 
 function AnimatedCount({ value, duration = 1.5 }: { value: number; duration?: number }) {
@@ -109,7 +105,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 400 }}>
-        <CircularProgress />
+        <CircularProgress aria-label="Loading dashboard" />
       </Box>
     );
   }
@@ -225,16 +221,18 @@ export default function DashboardPage() {
                           fontSize: 13,
                         }}
                       />
-                      <Bar
-                        dataKey="count"
-                        fill="#7c3aed"
-                        radius={[4, 4, 0, 0]}
-                        name="Analyses"
-                      />
+                      <Bar dataKey="count" fill="#7c3aed" radius={[4, 4, 0, 0]} name="Analyses" />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <Box sx={{ height: 260, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box
+                    sx={{
+                      height: 260,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Typography color="text.secondary">No data available</Typography>
                   </Box>
                 )}
@@ -285,7 +283,14 @@ export default function DashboardPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <Box sx={{ height: 260, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box
+                    sx={{
+                      height: 260,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Typography color="text.secondary">No data available</Typography>
                   </Box>
                 )}
@@ -335,7 +340,14 @@ export default function DashboardPage() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <Box sx={{ height: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box
+                    sx={{
+                      height: 300,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Typography color="text.secondary">No signal data</Typography>
                   </Box>
                 )}
@@ -388,9 +400,14 @@ export default function DashboardPage() {
                         />
                       </PieChart>
                     </ResponsiveContainer>
-                    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
+                    <Box
+                      sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: "center" }}
+                    >
                       {trends.classificationBreakdown.map((item, i) => (
-                        <Box key={item.label} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Box
+                          key={item.label}
+                          sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                        >
                           <Box
                             sx={{
                               width: 12,
@@ -407,7 +424,14 @@ export default function DashboardPage() {
                     </Box>
                   </Box>
                 ) : (
-                  <Box sx={{ height: 260, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box
+                    sx={{
+                      height: 260,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Typography color="text.secondary">No data available</Typography>
                   </Box>
                 )}
@@ -424,7 +448,11 @@ export default function DashboardPage() {
         >
           <Paper
             elevation={0}
-            sx={{ borderRadius: 3, border: `1px solid ${theme.palette.divider}`, overflow: "hidden" }}
+            sx={{
+              borderRadius: 3,
+              border: `1px solid ${theme.palette.divider}`,
+              overflow: "hidden",
+            }}
           >
             <Box sx={{ p: 3, pb: 0 }}>
               <Typography variant="subtitle1" fontWeight={600}>
@@ -454,8 +482,8 @@ export default function DashboardPage() {
                         item.label === "ai"
                           ? "#ef4444"
                           : item.label === "human"
-                          ? "#22c55e"
-                          : "#f59e0b";
+                            ? "#22c55e"
+                            : "#f59e0b";
                       return (
                         <TableRow key={item.id} hover>
                           <TableCell>

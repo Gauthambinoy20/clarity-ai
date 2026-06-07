@@ -76,9 +76,7 @@ export default function HistoryPage() {
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      items = items.filter((item) =>
-        item.textPreview.toLowerCase().includes(q)
-      );
+      items = items.filter((item) => item.textPreview.toLowerCase().includes(q));
     }
 
     return items;
@@ -128,8 +126,9 @@ export default function HistoryPage() {
               }}
             />
             <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Type</InputLabel>
+              <InputLabel id="history-type-filter-label">Type</InputLabel>
               <Select
+                labelId="history-type-filter-label"
                 value={typeFilter}
                 label="Type"
                 onChange={(e) => setTypeFilter(e.target.value)}
@@ -167,9 +166,7 @@ export default function HistoryPage() {
                 ) : filteredItems.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">
-                        No analyses found.
-                      </Typography>
+                      <Typography color="text.secondary">No analyses found.</Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -212,11 +209,7 @@ export default function HistoryPage() {
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
-                        <Chip
-                          label={item.label}
-                          size="small"
-                          color={getLabelColor(item.label)}
-                        />
+                        <Chip label={item.label} size="small" color={getLabelColor(item.label)} />
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="caption" color="text.secondary">
@@ -229,8 +222,7 @@ export default function HistoryPage() {
                             size="small"
                             onClick={() => {
                               if (item.type === "detection") navigate("/");
-                              else if (item.type === "plagiarism")
-                                navigate("/plagiarism");
+                              else if (item.type === "plagiarism") navigate("/plagiarism");
                               else navigate("/humanize");
                             }}
                           >

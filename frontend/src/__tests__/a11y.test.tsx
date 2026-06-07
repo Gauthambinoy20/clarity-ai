@@ -31,6 +31,10 @@ import PlagiarismPage from "@/pages/PlagiarismPage";
 import HumanizePage from "@/pages/HumanizePage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import BatchPage from "@/pages/BatchPage";
+import DetectPage from "@/pages/DetectPage";
+import ComparePage from "@/pages/ComparePage";
+import HistoryPage from "@/pages/HistoryPage";
+import DashboardPage from "@/pages/DashboardPage";
 
 const mockedApi = vi.mocked(api);
 
@@ -72,22 +76,34 @@ describe("page accessibility — clean pages", () => {
 });
 
 /**
- * Pages with real, pre-existing accessibility gaps. These are left as test.todo
- * rather than asserted, because making them pass would require editing the page
- * source (out of scope for this test work). Each todo names the exact axe rule
- * so the gap is unambiguous when someone picks it up.
- *
- * - DetectPage: "heading-order" (moderate) — a heading level is skipped; the
- *   first heading on the screen is an h4 with no preceding h1/h2/h3.
- * - ComparePage: "heading-order" (moderate) — same skipped-level issue.
- * - HistoryPage: "aria-input-field-name" (serious) — the "Type" filter Select
- *   exposes a combobox role with no accessible name to assistive tech.
- * - DashboardPage: "aria-progressbar-name" (serious) — a loading progressbar
- *   has no accessible name while data is being fetched.
+ * These four pages had real violations when the suite was first written:
+ * skipped heading levels on Detect/Compare, an unnamed filter combobox on
+ * History, an unnamed loading progressbar on Dashboard. The components were
+ * fixed (semantic heading components, labelId wiring, an aria-label), so
+ * they are asserted clean like the rest.
  */
-describe("page accessibility — known gaps", () => {
-  it.todo("DetectPage: heading-order (h4 with no preceding higher-level heading)");
-  it.todo("ComparePage: heading-order (h4 with no preceding higher-level heading)");
-  it.todo("HistoryPage: aria-input-field-name on the Type filter Select");
-  it.todo("DashboardPage: aria-progressbar-name on the loading progressbar");
+describe("page accessibility — previously violating pages", () => {
+  it("DetectPage has no axe violations", async () => {
+    const { container } = renderWithProviders(<DetectPage />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("ComparePage has no axe violations", async () => {
+    const { container } = renderWithProviders(<ComparePage />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("HistoryPage has no axe violations", async () => {
+    const { container } = renderWithProviders(<HistoryPage />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("DashboardPage has no axe violations", async () => {
+    const { container } = renderWithProviders(<DashboardPage />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
 });

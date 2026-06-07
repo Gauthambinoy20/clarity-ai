@@ -135,18 +135,9 @@ function StatMiniCard({
 
 /* ─── signal bar (compact) ────────────────────────────────────────── */
 
-function SignalBar({
-  name,
-  score,
-  delay,
-}: {
-  name: string;
-  score: number;
-  delay: number;
-}) {
+function SignalBar({ name, score, delay }: { name: string; score: number; delay: number }) {
   const pct = Math.round(score * 100);
-  const barColor =
-    pct > 70 ? "#ef4444" : pct > 40 ? "#f59e0b" : "#22c55e";
+  const barColor = pct > 70 ? "#ef4444" : pct > 40 ? "#f59e0b" : "#22c55e";
 
   return (
     <motion.div
@@ -279,7 +270,7 @@ function RightDashboard({ result }: { result: DetectionResult }) {
         {/* ── Signal Scores ── */}
         <Card sx={{ flex: 1, overflow: "auto" }}>
           <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-            <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+            <Typography variant="subtitle2" component="p" fontWeight={700} sx={{ mb: 1.5 }}>
               Detection Signals
             </Typography>
 
@@ -304,7 +295,7 @@ function RightDashboard({ result }: { result: DetectionResult }) {
         {signals.length > 2 && (
           <Card>
             <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
+              <Typography variant="subtitle2" component="p" fontWeight={700} sx={{ mb: 1 }}>
                 Signal Radar
               </Typography>
               <Box sx={{ height: 250 }}>
@@ -385,12 +376,12 @@ function EmptyDashboard() {
           sx={{ fontSize: 36, color: theme.palette.primary.main, opacity: 0.6 }}
         />
       </Box>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
+      <Typography variant="h6" component="h2" fontWeight={600} gutterBottom>
         Analysis Dashboard
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300 }}>
-        Paste or upload text on the left and click <strong>Analyze</strong> to see
-        detailed AI detection results with signal breakdown, heatmaps, and more.
+        Paste or upload text on the left and click <strong>Analyze</strong> to see detailed AI
+        detection results with signal breakdown, heatmaps, and more.
       </Typography>
 
       <Box sx={{ mt: 4, display: "flex", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
@@ -445,9 +436,11 @@ export default function DetectPage() {
       style={{ height: "100%" }}
     >
       {/* Header */}
-      <Box sx={{ mb: 3, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <Box
+        sx={{ mb: 3, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}
+      >
         <Box>
-          <Typography variant="h4" fontWeight={800} gutterBottom>
+          <Typography variant="h4" component="h1" fontWeight={800} gutterBottom>
             AI Content Detection
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -470,8 +463,23 @@ export default function DetectPage() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
             {/* Input Card */}
             <Card sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-              <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column", p: 2.5, "&:last-child": { pb: 2.5 } }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+              <CardContent
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  p: 2.5,
+                  "&:last-child": { pb: 2.5 },
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5,
+                  }}
+                >
                   <Tabs
                     value={inputTab}
                     onChange={(_, v) => setInputTab(v)}
@@ -501,10 +509,7 @@ export default function DetectPage() {
                     />
                   )}
                   {inputTab === 1 && (
-                    <FileUpload
-                      onFileContent={handleFileContent}
-                      disabled={isAnalyzing}
-                    />
+                    <FileUpload onFileContent={handleFileContent} disabled={isAnalyzing} />
                   )}
                 </Box>
               </CardContent>
@@ -555,7 +560,7 @@ export default function DetectPage() {
                 }}
               >
                 <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" component="p" fontWeight={600} sx={{ mb: 1 }}>
                     Tips for best results
                   </Typography>
                   <Box component="ul" sx={{ m: 0, pl: 2, "& li": { mb: 0.5 } }}>
