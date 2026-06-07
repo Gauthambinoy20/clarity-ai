@@ -127,34 +127,40 @@ class ModelRegistry:
     @classmethod
     def _load_sync(cls, model_id: str, hub_id: str) -> Any:
         """Dispatch to the correct loader based on *model_id*."""
+        from app.core.config import MODEL_REVISIONS
+
+        # Pinned hub revision: a hub-side change can never silently swap
+        # the weights this app runs. Unpinned ids fall back to default.
+        revision = MODEL_REVISIONS.get(hub_id)
+
         if model_id in ("gpt2", "distilgpt2", "gpt2-medium"):
-            return cls._load_causal_lm(hub_id)
+            return cls._load_causal_lm(hub_id, revision)
         if model_id in ("roberta-detector-1", "roberta-detector-2", "ai-detector-3"):
-            return cls._load_classifier_pipeline(hub_id)
+            return cls._load_classifier_pipeline(hub_id, revision)
         if model_id == "spacy":
             return cls._load_spacy(hub_id)
         if model_id == "sentence-transformers":
-            return cls._load_sentence_transformer(hub_id)
+            return cls._load_sentence_transformer(hub_id, revision)
         raise ValueError(f"No loader implemented for {model_id!r}")
 
     @staticmethod
-    def _load_causal_lm(hub_id: str) -> tuple:
+    def _load_causal_lm(hub_id: str, revision: str | None = None) -> tuple:
         """Load a causal-LM tokenizer + model from Hugging Face."""
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
-        tokenizer = AutoTokenizer.from_pretrained(hub_id)
+        tokenizer = AutoTokenizer.from_pretrained(hub_id, revision=revision)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
-        model = AutoModelForCausalLM.from_pretrained(hub_id)
+        model = AutoModelForCausalLM.from_pretrained(hub_id, revision=revision)
         model.eval()
         return tokenizer, model
 
     @staticmethod
-    def _load_classifier_pipeline(hub_id: str) -> Any:
+    def _load_classifier_pipeline(hub_id: str, revision: str | None = None) -> Any:
         """Load a text-classification pipeline from Hugging Face."""
         from transformers import pipeline as hf_pipeline
 
-        return hf_pipeline("text-classification", model=hub_id, truncation=True)
+        return hf_pipeline("text-classification", model=hub_id, revision=revision, truncation=True)
 
     @staticmethod
     def _load_spacy(model_name: str) -> Any:
@@ -171,8 +177,8 @@ class ModelRegistry:
             return spacy.load(model_name)
 
     @staticmethod
-    def _load_sentence_transformer(hub_id: str) -> Any:
+    def _load_sentence_transformer(hub_id: str, revision: str | None = None) -> Any:
         """Load a SentenceTransformer model."""
         from sentence_transformers import SentenceTransformer
 
-        return SentenceTransformer(hub_id)
+        return SentenceTransformer(hub_id, revision=revision)

@@ -4,7 +4,7 @@ AI-probability score with classification and interpretability metadata.
 """
 
 import logging
-import pickle
+import pickle  # nosec B403 - loads only this repo's own local artifacts
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -88,7 +88,7 @@ class EnsembleMetaLearner:
         if self._model_path and Path(self._model_path).exists():
             try:
                 with open(self._model_path, "rb") as fh:
-                    self._model = pickle.load(fh)
+                    self._model = pickle.load(fh)  # nosec B301 - trusted local file
                 logger.info("Meta-learner model loaded from %s", self._model_path)
             except Exception as exc:
                 logger.warning("Failed to load meta-learner model: %s", exc)

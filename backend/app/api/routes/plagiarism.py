@@ -249,7 +249,9 @@ async def check_plagiarism(
     all_sources: List[SourceMatch] = []
     for pa in paragraph_results:
         for src in pa.sources:
-            key = src.url or hashlib.md5(src.matched_text.encode()).hexdigest()
+            key = (
+                src.url or hashlib.md5(src.matched_text.encode(), usedforsecurity=False).hexdigest()
+            )
             if key not in seen_keys:
                 seen_keys.add(key)
                 all_sources.append(src)

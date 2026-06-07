@@ -89,7 +89,7 @@ class StructuralHumanizer:
 
     def __init__(self, seed: int | None = None) -> None:
         self._nlp = None  # lazy loaded
-        self._rng = random.Random(seed)
+        self._rng = random.Random(seed)  # nosec B311 - stylistic, not crypto
 
     @property
     def nlp(self):
@@ -211,7 +211,7 @@ class StructuralHumanizer:
         s1 = s1.rstrip(".")
         s2_lower = s2[0].lower() + s2[1:] if s2 else s2
         connectors = [", and ", " -- ", "; "]
-        connector = random.choice(connectors)
+        connector = random.choice(connectors)  # nosec B311 - stylistic, not crypto
         return s1 + connector + s2_lower
 
     # ------------------------------------------------------------------

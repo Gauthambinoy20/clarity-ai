@@ -29,7 +29,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-production"
 
     # ── Server ───────────────────────────────────────────────────────────
-    HOST: str = "0.0.0.0"
+    # Binding all interfaces is intentional: the app runs inside a
+    # container and the host/compose layer controls exposure.
+    HOST: str = "0.0.0.0"  # nosec B104
     PORT: int = 8000
     WORKERS: int = 1
 
@@ -116,3 +118,16 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Hugging Face revisions pinned per hub id so a hub-side update (or a
+# hijacked repo) can never silently change what this app downloads.
+# Refresh deliberately, with a re-test, when bumping a model.
+MODEL_REVISIONS: dict[str, str] = {
+    "openai-community/gpt2": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+    "distilgpt2": "2290a62682d06624634c1f46a6ad5be0f47f38aa",
+    "openai-community/gpt2-medium": "6dcaa7a952f72f9298047fd5137cd6e4f05f41da",
+    "Hello-SimpleAI/chatgpt-detector-roberta": "d2b342c61775d5dd0221808a79983ed3b86ffd86",
+    "openai-community/roberta-large-openai-detector": "38f3e0ccf205e9c4e0b38ae9d75ec948141bf832",
+    "PirateXX/AI-Content-Detector": "0d5450c5baf7c6ccab387a120bcc9c2a4d2d3d9c",
+    "sentence-transformers/all-MiniLM-L6-v2": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+}

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 import os
-import pickle
+import pickle  # nosec B403 - loads only this repo's own local artifacts
 from typing import Dict, List
 
 import torch
@@ -41,7 +41,7 @@ class GhostbusterDetector(BaseDetector):
         if os.path.exists(_CLF_PATH):
             try:
                 with open(_CLF_PATH, "rb") as f:
-                    return pickle.load(f)
+                    return pickle.load(f)  # nosec B301 - trusted local file
             except Exception as exc:
                 logger.warning("Could not load Ghostbuster classifier: %s", exc)
         return None

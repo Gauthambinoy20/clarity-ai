@@ -73,8 +73,8 @@ async def health_check():
 
         registry = ModelRegistry()
         loaded_count = len(registry._models) + len(registry._tokenizers) + len(registry._pipelines)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("model registry not inspectable: %s", exc)
 
     # Check Ollama
     ollama_available = False
@@ -82,8 +82,8 @@ async def health_check():
         async with httpx.AsyncClient(timeout=3.0) as client:
             resp = await client.get(f"{settings.OLLAMA_BASE_URL}/api/tags")
             ollama_available = resp.status_code == 200
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("ollama not reachable: %s", exc)
 
     uptime = time.time() - _startup_time
 

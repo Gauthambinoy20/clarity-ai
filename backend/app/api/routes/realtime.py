@@ -281,5 +281,5 @@ async def ws_detect(websocket: WebSocket):
                     "message": f"Internal server error: {str(exc)}",
                 }
             )
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("could not deliver error frame: %s", exc)

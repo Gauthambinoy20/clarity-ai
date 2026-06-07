@@ -340,7 +340,7 @@ class LexicalHumanizer:
         seed: int | None = None,
     ) -> None:
         self.contraction_probability = contraction_probability
-        self._rng = random.Random(seed)
+        self._rng = random.Random(seed)  # nosec B311 - stylistic, not crypto
 
     # ------------------------------------------------------------------
     # Public API

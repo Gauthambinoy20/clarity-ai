@@ -407,8 +407,8 @@ async def _search_arxiv(query: str, client: httpx.AsyncClient) -> List[Dict[str,
         resp = await client.get(url, params=params, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
 
-        # Parse Atom XML
-        import xml.etree.ElementTree as ET
+        # Parse Atom XML — defused parser because this is external content
+        import defusedxml.ElementTree as ET
 
         root = ET.fromstring(resp.text)
         ns = {"atom": "http://www.w3.org/2005/Atom"}

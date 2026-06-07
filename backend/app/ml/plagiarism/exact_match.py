@@ -33,7 +33,7 @@ def _kgrams(words: List[str], k: int) -> List[str]:
 
 def _hash_kgram(kgram: str) -> int:
     """Deterministic integer hash of a k-gram string."""
-    return int(hashlib.md5(kgram.encode("utf-8")).hexdigest()[:8], 16)
+    return int(hashlib.md5(kgram.encode("utf-8"), usedforsecurity=False).hexdigest()[:8], 16)
 
 
 class ExactMatcher:
