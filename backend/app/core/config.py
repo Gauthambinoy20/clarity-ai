@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
+from typing import Annotated, List
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -38,7 +38,9 @@ class Settings(BaseSettings):
     DB_ECHO: bool = False
 
     # ── CORS ─────────────────────────────────────────────────────────────
-    CORS_ORIGINS: List[str] = [
+    # NoDecode stops pydantic-settings from JSON-decoding the env value
+    # before our comma-splitting validator can run ("a,b" is not JSON).
+    CORS_ORIGINS: Annotated[List[str], NoDecode] = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://localhost:8000",
