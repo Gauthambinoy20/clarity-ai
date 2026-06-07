@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, lazy, Suspense } from "react";
 import {
   Box,
   Card,
@@ -31,9 +31,11 @@ import TextInput from "@/components/input/TextInput";
 import FileUpload from "@/components/input/FileUpload";
 import LoadingProgress from "@/components/common/LoadingProgress";
 import ScoreGauge from "@/components/common/ScoreGauge";
-import SignalRadar from "@/components/analysis/SignalRadar";
-import SentenceHeatmap from "@/components/analysis/SentenceHeatmap";
-import GLTRVisualization from "@/components/analysis/GLTRVisualization";
+// The chart-heavy visualisations only render once a result exists, so
+// they stay out of the landing bundle and load on demand.
+const SignalRadar = lazy(() => import("@/components/analysis/SignalRadar"));
+const SentenceHeatmap = lazy(() => import("@/components/analysis/SentenceHeatmap"));
+const GLTRVisualization = lazy(() => import("@/components/analysis/GLTRVisualization"));
 import QuickActionsToolbar from "@/components/advanced/QuickActionsToolbar";
 import ShareAnalysis from "@/components/advanced/ShareAnalysis";
 import { useDetection } from "@/hooks/useDetection";
@@ -296,7 +298,9 @@ function RightDashboard({ result }: { result: DetectionResult }) {
                 Signal Radar
               </Typography>
               <Box sx={{ height: 250 }}>
-                <SignalRadar signals={signals} />
+                <Suspense fallback={<LinearProgress />}>
+                  <SignalRadar signals={signals} />
+                </Suspense>
               </Box>
             </CardContent>
           </Card>
@@ -313,7 +317,9 @@ function RightDashboard({ result }: { result: DetectionResult }) {
 
             {vizTab === 0 && result.sentences && result.sentences.length > 0 && (
               <Box sx={{ maxHeight: 300, overflow: "auto" }}>
-                <SentenceHeatmap sentences={result.sentences} />
+                <Suspense fallback={<LinearProgress />}>
+                  <SentenceHeatmap sentences={result.sentences} />
+                </Suspense>
               </Box>
             )}
             {vizTab === 0 && (!result.sentences || result.sentences.length === 0) && (
@@ -323,7 +329,9 @@ function RightDashboard({ result }: { result: DetectionResult }) {
             )}
             {vizTab === 1 && result.gltrTokens && result.gltrTokens.length > 0 && (
               <Box sx={{ maxHeight: 300, overflow: "auto" }}>
-                <GLTRVisualization tokens={result.gltrTokens} />
+                <Suspense fallback={<LinearProgress />}>
+                  <GLTRVisualization tokens={result.gltrTokens} />
+                </Suspense>
               </Box>
             )}
             {vizTab === 1 && (!result.gltrTokens || result.gltrTokens.length === 0) && (
