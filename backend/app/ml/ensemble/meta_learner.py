@@ -251,7 +251,7 @@ class EnsembleMetaLearner:
     def _top_contributing_signals(
         signal_results: Dict[str, Dict[str, Any]], top_n: int = 5
     ) -> List[Dict[str, Any]]:
-        scored: List[Tuple[str, float, str]] = []
+        scored: List[Tuple[str, float, str, float]] = []
         for name in SIGNAL_NAMES:
             result = signal_results.get(name, {})
             prob = float(result.get("ai_probability", 0.5))

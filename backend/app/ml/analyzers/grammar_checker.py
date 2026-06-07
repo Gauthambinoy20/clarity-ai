@@ -246,7 +246,7 @@ class GrammarChecker:
 
     def _check_repeated_words(self, text: str) -> List[Dict[str, Any]]:
         """Detect immediately repeated words like 'the the'."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         pattern = re.compile(r"\b(\w+)\s+\1\b", re.IGNORECASE)
         for match in pattern.finditer(text):
             issues.append(
@@ -261,7 +261,7 @@ class GrammarChecker:
 
     def _check_double_negatives(self, text: str) -> List[Dict[str, Any]]:
         """Detect double negatives."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         patterns = [
             r"\b(don't|doesn't|didn't|can't|won't|shouldn't|wouldn't|couldn't|isn't|aren't|wasn't|weren't)\s+\w*\s*(no|not|never|nothing|nowhere|nobody|none|neither)\b",
             r"\b(not|never)\s+\w*\s*(no|not|never|nothing|nowhere|nobody|none|neither|un\w+)\b",
@@ -280,7 +280,7 @@ class GrammarChecker:
 
     def _check_run_on_sentences(self, sentences: List[str]) -> List[Dict[str, Any]]:
         """Flag sentences with more than 50 words."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         offset = 0
         for sent in sentences:
             word_count = len(sent.split())
@@ -298,7 +298,7 @@ class GrammarChecker:
 
     def _check_sentence_fragments(self, sentences: List[str], doc) -> List[Dict[str, Any]]:
         """Detect sentence fragments (no main verb)."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         if doc is None:
             return issues
 
@@ -325,7 +325,7 @@ class GrammarChecker:
 
     def _check_subject_verb_agreement(self, text: str) -> List[Dict[str, Any]]:
         """Basic subject-verb agreement checks via regex."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         patterns = [
             (r"\b(he|she|it)\s+(are|were|have)\b", "should use 'is/was/has'"),
             (r"\b(they|we)\s+(is|was|has)\b", "should use 'are/were/have'"),
@@ -348,7 +348,7 @@ class GrammarChecker:
 
     def _check_comma_splices(self, text: str) -> List[Dict[str, Any]]:
         """Detect comma splices: two independent clauses joined by only a comma."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         # Heuristic: comma followed by a pronoun or proper subject starting a new clause
         pattern = re.compile(
             r",\s+(he|she|it|they|we|I|you|this|that|these|those)\s+(is|are|was|were|will|would|can|could|has|have|had|do|does|did)\b",
@@ -367,7 +367,7 @@ class GrammarChecker:
 
     def _check_missing_articles(self, doc) -> List[Dict[str, Any]]:
         """Detect potential missing articles before singular countable nouns."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         if doc is None:
             return issues
 
@@ -434,7 +434,7 @@ class GrammarChecker:
 
     def _check_cliches(self, text: str) -> List[Dict[str, Any]]:
         """Detect cliches in text."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         text_lower = text.lower()
         for cliche in _CLICHES:
             idx = text_lower.find(cliche)
@@ -451,7 +451,7 @@ class GrammarChecker:
 
     def _check_wordiness(self, text: str) -> List[Dict[str, Any]]:
         """Detect wordy phrases and suggest concise alternatives."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         text_lower = text.lower()
         for verbose, concise in _WORDINESS:
             idx = text_lower.find(verbose)
@@ -468,7 +468,7 @@ class GrammarChecker:
 
     def _check_adverb_overuse(self, doc) -> List[Dict[str, Any]]:
         """Flag excessive adverb usage (>5% of tokens ending in -ly)."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         if doc is None:
             return issues
 
@@ -492,7 +492,7 @@ class GrammarChecker:
 
     def _check_weak_verbs(self, doc) -> List[Dict[str, Any]]:
         """Flag overuse of weak verbs (is, was, were, have, get, etc.)."""
-        issues = []
+        issues: List[Dict[str, Any]] = []
         if doc is None:
             return issues
 

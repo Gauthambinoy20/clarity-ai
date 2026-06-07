@@ -202,7 +202,12 @@ async def _search_duckduckgo(query: str, client: httpx.AsyncClient) -> List[Dict
     results: List[Dict[str, Any]] = []
     try:
         url = "https://api.duckduckgo.com/"
-        params = {"q": query, "format": "json", "no_html": "1", "skip_disambig": "1"}
+        params: Dict[str, str | int] = {
+            "q": query,
+            "format": "json",
+            "no_html": "1",
+            "skip_disambig": "1",
+        }
         resp = await client.get(url, params=params, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
         data = resp.json()
@@ -239,7 +244,7 @@ async def _search_semantic_scholar(query: str, client: httpx.AsyncClient) -> Lis
     results: List[Dict[str, Any]] = []
     try:
         url = "https://api.semanticscholar.org/graph/v1/paper/search"
-        params = {
+        params: Dict[str, str | int] = {
             "query": query,
             "limit": MAX_RESULTS_PER_ENGINE,
             "fields": "title,abstract,url,year,authors",
@@ -272,7 +277,7 @@ async def _search_crossref(query: str, client: httpx.AsyncClient) -> List[Dict[s
     results: List[Dict[str, Any]] = []
     try:
         url = "https://api.crossref.org/works"
-        params = {
+        params: Dict[str, str | int] = {
             "query": query,
             "rows": MAX_RESULTS_PER_ENGINE,
             "select": "DOI,title,abstract,URL,author,published-print",
@@ -311,7 +316,7 @@ async def _search_openalex(query: str, client: httpx.AsyncClient) -> List[Dict[s
     results: List[Dict[str, Any]] = []
     try:
         url = "https://api.openalex.org/works"
-        params = {
+        params: Dict[str, str | int] = {
             "search": query,
             "per_page": MAX_RESULTS_PER_ENGINE,
             "select": "id,title,doi,publication_year,authorships,abstract_inverted_index",
@@ -360,7 +365,7 @@ async def _search_wikipedia(query: str, client: httpx.AsyncClient) -> List[Dict[
     results: List[Dict[str, Any]] = []
     try:
         url = "https://en.wikipedia.org/w/api.php"
-        params = {
+        params: Dict[str, str | int] = {
             "action": "query",
             "list": "search",
             "srsearch": query,
@@ -394,7 +399,7 @@ async def _search_arxiv(query: str, client: httpx.AsyncClient) -> List[Dict[str,
     results: List[Dict[str, Any]] = []
     try:
         url = "http://export.arxiv.org/api/query"
-        params = {
+        params: Dict[str, str | int] = {
             "search_query": f"all:{quote_plus(query)}",
             "start": 0,
             "max_results": MAX_RESULTS_PER_ENGINE,

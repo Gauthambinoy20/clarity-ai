@@ -220,7 +220,7 @@ class CitationExtractor:
         references: List[Dict[str, Any]],
     ) -> List[Dict[str, Any]]:
         """Check which inline citations lack a corresponding reference entry."""
-        missing = []
+        missing: List[Dict[str, Any]] = []
         if not inline_citations or not references:
             return missing
 
@@ -284,7 +284,7 @@ class CitationExtractor:
             issues.append(
                 {
                     "type": "mixed_styles",
-                    "message": f"Multiple citation styles detected: {', '.join(sorted(styles_used))}. Use a single consistent style.",
+                    "message": f"Multiple citation styles detected: {', '.join(sorted(s for s in styles_used if s))}. Use a single consistent style.",
                     "severity": "warning",
                 }
             )

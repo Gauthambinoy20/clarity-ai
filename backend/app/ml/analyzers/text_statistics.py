@@ -294,7 +294,7 @@ class TextStatisticsAnalyzer:
             "PUNCT": "punctuation",
         }
 
-        distribution = {}
+        distribution: Dict[str, Any] = {}
         for pos, label in pos_labels.items():
             count = pos_counts.get(pos, 0)
             if label in distribution:

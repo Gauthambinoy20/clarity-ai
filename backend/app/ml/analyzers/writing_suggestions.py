@@ -228,7 +228,7 @@ class WritingSuggestionEngine:
 
     def _check_long_paragraphs(self, paragraphs: List[str], full_text: str) -> List[Dict[str, Any]]:
         """Flag paragraphs longer than 150 words."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         for para in paragraphs:
             word_count = len(para.split())
             if word_count > 150:
@@ -253,7 +253,7 @@ class WritingSuggestionEngine:
         self, sentences: List[str], full_text: str
     ) -> List[Dict[str, Any]]:
         """Flag consecutive sentences starting with the same word."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         if len(sentences) < 3:
             return suggestions
 
@@ -279,7 +279,7 @@ class WritingSuggestionEngine:
 
     def _check_transition_words(self, sentences: List[str], full_text: str) -> List[Dict[str, Any]]:
         """Flag lack of transition words between paragraphs/sentences."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         if len(sentences) < 5:
             return suggestions
 
@@ -306,7 +306,7 @@ class WritingSuggestionEngine:
         self, sentences: List[str], full_text: str
     ) -> List[Dict[str, Any]]:
         """Flag clusters of consecutive passive voice sentences."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         nlp = self.nlp
         if nlp is None:
             return suggestions
@@ -358,7 +358,7 @@ class WritingSuggestionEngine:
 
     def _check_jargon(self, text: str) -> List[Dict[str, Any]]:
         """Flag jargon and buzzword overuse."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         text_lower = text.lower()
         words = re.findall(r"[a-z]+(?:-[a-z]+)*", text_lower)
         jargon_found = [w for w in words if w in _JARGON_WORDS]
@@ -392,7 +392,7 @@ class WritingSuggestionEngine:
 
     def _check_redundant_phrases(self, text: str) -> List[Dict[str, Any]]:
         """Flag redundant phrases."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         text_lower = text.lower()
         for redundant, concise in _REDUNDANT_PHRASES:
             idx = text_lower.find(redundant)
@@ -411,7 +411,7 @@ class WritingSuggestionEngine:
 
     def _check_sentence_variety(self, sentences: List[str]) -> List[Dict[str, Any]]:
         """Flag lack of sentence length variety."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         if len(sentences) < 5:
             return suggestions
 
@@ -438,7 +438,7 @@ class WritingSuggestionEngine:
         self, paragraphs: List[str], full_text: str
     ) -> List[Dict[str, Any]]:
         """Flag single-sentence paragraphs in sequence or no paragraph breaks."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
 
         if len(paragraphs) == 1 and len(full_text.split()) > 200:
             suggestions.append(
@@ -476,7 +476,7 @@ class WritingSuggestionEngine:
 
     def _check_vague_language(self, text: str) -> List[Dict[str, Any]]:
         """Flag vague or imprecise language."""
-        suggestions = []
+        suggestions: List[Dict[str, Any]] = []
         vague_words = {
             "things": "Specify what 'things' refers to.",
             "stuff": "Replace 'stuff' with a specific noun.",
@@ -491,7 +491,7 @@ class WritingSuggestionEngine:
 
         text_lower = text.lower()
         words = re.findall(r"[a-z]+", text_lower)
-        word_freq = {}
+        word_freq: Dict[str, int] = {}
         for w in words:
             word_freq[w] = word_freq.get(w, 0) + 1
 

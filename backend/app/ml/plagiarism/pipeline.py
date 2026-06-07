@@ -131,7 +131,7 @@ class PlagiarismPipeline:
         all_matched_sources: List[Dict[str, Any]] = []
 
         for para_idx, paragraph in enumerate(paragraphs):
-            para_result = {
+            para_result: Dict[str, Any] = {
                 "paragraph_index": para_idx,
                 "text": paragraph[:200] + ("..." if len(paragraph) > 200 else ""),
                 "word_count": len(paragraph.split()),

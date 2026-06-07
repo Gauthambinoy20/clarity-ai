@@ -204,11 +204,11 @@ async def export_json(
     """Export full analysis as formatted JSON."""
     analysis_id = request.analysis_id or "ad-hoc"
     if request.data is not None:
-        export = {"analysis_id": analysis_id, "results": request.data}
+        export: Dict[str, Any] = {"analysis_id": analysis_id, "results": request.data}
     elif request.analysis_id:
         record = await _fetch_analytics_result(db, request.analysis_id)
         data = json.loads(record.results_json) if record.results_json else {}
-        export = {
+        export = {  # type: ignore[no-redef]
             "analysis_id": record.id,
             "analysis_type": record.analysis_type,
             "created_at": record.created_at.isoformat() if record.created_at else None,
