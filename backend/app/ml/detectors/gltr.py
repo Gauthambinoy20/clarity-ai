@@ -23,6 +23,19 @@ MAX_LENGTH = 512
 
 class GLTRDetector(BaseDetector):
 
+    # Sigmoid centre/scale for mapping the top-10 ratio onto a probability.
+    # Calibrated 2026-06 against a small labelled probe set on gpt2-small:
+    # human prose measured 0.58-0.65, LLM prose 0.70-0.79, so the boundary
+    # sits between them. The old centre (0.45) flagged nearly all fluent
+    # English as AI because gpt2 finds ordinary prose highly predictable.
+    SCORE_CENTER = 0.675
+    SCORE_SCALE = 0.07
+
+    @classmethod
+    def _score_from_top10(cls, ratio: float) -> float:
+        """Map a top-10 token ratio onto an AI probability."""
+        return cls._clamp(cls._sigmoid((ratio - cls.SCORE_CENTER) / cls.SCORE_SCALE))
+
     @staticmethod
     @torch.no_grad()
     def _analyze_tokens(text: str, model, tokenizer) -> List[Dict]:
@@ -95,7 +108,7 @@ class GLTRDetector(BaseDetector):
                 counts[t["bucket"]] += 1
 
             top10_ratio = counts["top10"] / total
-            ai_prob = self._clamp(self._sigmoid((top10_ratio - 0.45) / 0.15))
+            ai_prob = self._score_from_top10(top10_ratio)
 
             mean_rank = float(np.mean([t["rank"] for t in token_data]))
             mean_entropy = float(np.mean([t["entropy"] for t in token_data]))

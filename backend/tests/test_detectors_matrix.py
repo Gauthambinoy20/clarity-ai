@@ -158,3 +158,35 @@ async def test_fingerprint_scores_ai_text_above_human():
     ai = await detector.analyze(AI_TEXT)
     human = await detector.analyze(HUMAN_TEXT)
     assert ai["ai_probability"] > human["ai_probability"]
+
+
+# ---------------------------------------------------------------------------
+# GLTR score calibration — pure math, no model needed. The centre/scale
+# were measured against a labelled probe set on gpt2-small (2026-06):
+# human prose lands at top-10 ratios of 0.58-0.65, LLM prose at 0.70-0.79.
+# ---------------------------------------------------------------------------
+
+
+class TestGLTRCalibration:
+    def _score(self, ratio):
+        from app.ml.detectors.gltr import GLTRDetector
+
+        return GLTRDetector._score_from_top10(ratio)
+
+    def test_measured_human_ratios_score_below_neutral(self):
+        # the three measured human samples from the probe set
+        for ratio in (0.5762, 0.6310, 0.6432):
+            assert self._score(ratio) < 0.45
+
+    def test_measured_ai_ratios_score_above_neutral(self):
+        # the three measured LLM samples from the probe set
+        for ratio in (0.7054, 0.7388, 0.7879):
+            assert self._score(ratio) > 0.6
+
+    def test_mapping_is_monotonic(self):
+        scores = [self._score(r / 100) for r in range(0, 101, 5)]
+        assert scores == sorted(scores)
+
+    def test_mapping_stays_in_probability_range(self):
+        assert self._score(0.0) >= 0.0
+        assert self._score(1.0) <= 1.0
