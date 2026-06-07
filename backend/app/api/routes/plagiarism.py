@@ -117,8 +117,9 @@ async def _semantic_similarity(text_a: str, text_b: str) -> float:
     try:
         from app.ml.models.model_registry import ModelRegistry
 
-        registry = ModelRegistry()
-        model = registry.get_sentence_transformer(settings.SENTENCE_MODEL)
+        # The registry is async and keyed by id; encode() itself is sync
+        # CPU work, so that part runs in the executor.
+        model = await ModelRegistry.get_model("sentence-transformers")
         loop = asyncio.get_running_loop()
         embeddings = await loop.run_in_executor(None, model.encode, [text_a, text_b])
         import numpy as np
