@@ -20,7 +20,6 @@ import Grid from "@mui/material/Grid2";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -33,7 +32,6 @@ import FileUpload from "@/components/input/FileUpload";
 import LoadingProgress from "@/components/common/LoadingProgress";
 import ScoreGauge from "@/components/common/ScoreGauge";
 import SignalRadar from "@/components/analysis/SignalRadar";
-import SignalBreakdown from "@/components/analysis/SignalBreakdown";
 import SentenceHeatmap from "@/components/analysis/SentenceHeatmap";
 import GLTRVisualization from "@/components/analysis/GLTRVisualization";
 import QuickActionsToolbar from "@/components/advanced/QuickActionsToolbar";
@@ -93,7 +91,6 @@ function StatMiniCard({
   value: string;
   color: string;
 }) {
-  const theme = useTheme();
   return (
     <Paper
       elevation={0}

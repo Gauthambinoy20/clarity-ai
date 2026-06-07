@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
-  Card,
-  CardContent,
   Paper,
   Table,
   TableBody,

@@ -91,9 +91,7 @@ function SimilarityGauge({ score }: { score: number }) {
   );
 }
 
-export default function ComparisonView({ data, textA, textB }: ComparisonViewProps) {
-  const theme = useTheme();
-
+export default function ComparisonView({ data }: ComparisonViewProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

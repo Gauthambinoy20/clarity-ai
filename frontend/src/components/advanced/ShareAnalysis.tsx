@@ -17,17 +17,14 @@ import {
   Divider,
   alpha,
   useTheme,
-  Chip,
 } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EmailIcon from "@mui/icons-material/Email";
 import DownloadIcon from "@mui/icons-material/Download";
 import LinkIcon from "@mui/icons-material/Link";
-import QrCode2Icon from "@mui/icons-material/QrCode2";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import { motion } from "framer-motion";
 
 /* ─── Types ──────────────────────────────────────────────────────── */
 
@@ -68,8 +65,6 @@ function SimpleQRCode({ value, size = 160 }: { value: string; size?: number }) {
         const isBottomLeft = row >= gridSize - 7 && col < 7;
 
         if (isTopLeft || isTopRight || isBottomLeft) {
-          const lr = isTopLeft ? 0 : isBottomLeft ? gridSize - 7 : 0;
-          const lc = isTopLeft ? 0 : isTopRight ? gridSize - 7 : 0;
           const rr = row - (isBottomLeft ? gridSize - 7 : 0);
           const rc = col - (isTopRight ? gridSize - 7 : 0);
           const isBorder = rr === 0 || rr === 6 || rc === 0 || rc === 6;

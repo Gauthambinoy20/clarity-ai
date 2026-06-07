@@ -66,7 +66,7 @@ const scoreColor = (score: number | null) => {
   return "#22c55e";
 };
 
-const rowBg = (score: number | null, theme: ReturnType<typeof useTheme>) => {
+const rowBg = (score: number | null, _theme: ReturnType<typeof useTheme>) => {
   if (score === null) return "transparent";
   const c = score > 70 ? "#ef4444" : score > 40 ? "#f59e0b" : "#22c55e";
   return alpha(c, 0.06);
@@ -182,7 +182,7 @@ export default function BatchProcessor({ onProcessBatch }: BatchProcessorProps) 
   const handlePasteSubmit = useCallback(() => {
     if (!pasteText.trim()) return;
     const segments = pasteText.split("---").filter((s) => s.trim());
-    segments.forEach((seg, idx) => {
+    segments.forEach((seg) => {
       const text = seg.trim();
       const words = text.split(/\s+/).length;
       setItems((prev) => [

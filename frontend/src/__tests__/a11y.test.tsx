@@ -18,7 +18,9 @@ import { renderWithProviders } from "./helpers/providers";
 // Teach vitest's expect about the axe matcher. vitest 1.x resolves custom
 // matcher types through @vitest/expect's Assertion interface, so augment that.
 declare module "@vitest/expect" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Assertion extends AxeMatchers {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface AsymmetricMatchersContaining extends AxeMatchers {}
 }
 

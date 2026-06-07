@@ -20,11 +20,7 @@ describe("api axios instance", () => {
   });
 
   it("sets Content-Type to application/json", () => {
-    // Axios merges headers at multiple levels; check the common headers
-    const contentType =
-      (api.defaults.headers as Record<string, Record<string, string>>)?.common?.["Content-Type"] ||
-      (api.defaults.headers as Record<string, string>)?.["Content-Type"] ||
-      (api.defaults.headers as Record<string, Record<string, string>>)?.post?.["Content-Type"];
+    // Axios merges headers at multiple levels; check the common headers.
     // At least one level should carry application/json
     const headers = api.defaults.headers as Record<string, unknown>;
     const rawContentType =

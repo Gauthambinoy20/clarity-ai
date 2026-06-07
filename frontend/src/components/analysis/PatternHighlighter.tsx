@@ -6,12 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 // Types
 // ---------------------------------------------------------------------------
 
-interface PatternMatch {
-  matched: string;
-  pattern?: string;
-  model?: string;
-}
-
 interface PatternCategory {
   count: number;
   examples: string[];

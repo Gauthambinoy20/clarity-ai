@@ -13,7 +13,6 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import RocketLaunchOutlinedIcon from "@mui/icons-material/RocketLaunchOutlined";
 import { motion, AnimatePresence } from "framer-motion";
 import ReadabilityPanel from "@/components/analytics/ReadabilityPanel";

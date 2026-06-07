@@ -8,7 +8,6 @@ import {
   alpha,
   useTheme,
   IconButton,
-  Tooltip,
   Paper,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -16,11 +15,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import HistoryIcon from "@mui/icons-material/History";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,

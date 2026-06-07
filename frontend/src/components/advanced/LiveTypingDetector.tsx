@@ -31,7 +31,6 @@ const getScoreColor = (score: number) => {
 /* ─── Mini Signal Bar ────────────────────────────────────────────── */
 
 function MiniSignalBar({ name, score, delay }: { name: string; score: number; delay: number }) {
-  const theme = useTheme();
   const pct = Math.round(score * 100);
   const color = getScoreColor(pct);
 

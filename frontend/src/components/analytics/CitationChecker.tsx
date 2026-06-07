@@ -10,8 +10,6 @@ import {
   ListItemText,
   Alert,
   LinearProgress,
-  Divider,
-  useTheme,
 } from "@mui/material";
 import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -25,8 +23,6 @@ interface CitationCheckerProps {
 }
 
 export default function CitationChecker({ data }: CitationCheckerProps) {
-  const theme = useTheme();
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

@@ -8,9 +8,7 @@ import {
   ListItem,
   Alert,
   Chip,
-  IconButton,
   Tooltip,
-  Collapse,
   useTheme,
 } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -278,7 +276,7 @@ export default function GrammarChecker({ data, onAcceptSuggestion }: GrammarChec
                 }}
               >
                 <AnimatePresence>
-                  {visibleErrors.map((error, i) => {
+                  {visibleErrors.map((error) => {
                     const config = severityConfig[error.severity];
                     return (
                       <motion.div

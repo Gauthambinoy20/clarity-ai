@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   Box,
   Button,
@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   CircularProgress,
-  Collapse,
   alpha,
   useTheme,
   Chip,
@@ -100,13 +99,16 @@ export default function QuickActionsToolbar({
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, ActionResult>>({});
 
-  const handlers: Record<string, ((t: string) => Promise<ActionResult>) | undefined> = {
-    humanize: onHumanize,
-    buzzwords: onRemoveBuzzwords,
-    grammar: onFixGrammar,
-    readability: onImproveReadability,
-    report: onGenerateReport,
-  };
+  const handlers: Record<string, ((t: string) => Promise<ActionResult>) | undefined> = useMemo(
+    () => ({
+      humanize: onHumanize,
+      buzzwords: onRemoveBuzzwords,
+      grammar: onFixGrammar,
+      readability: onImproveReadability,
+      report: onGenerateReport,
+    }),
+    [onHumanize, onRemoveBuzzwords, onFixGrammar, onImproveReadability, onGenerateReport]
+  );
 
   const handleAction = useCallback(
     async (actionId: string) => {
@@ -137,7 +139,7 @@ export default function QuickActionsToolbar({
             },
           }));
         }
-      } catch (err) {
+      } catch {
         setResults((prev) => ({
           ...prev,
           [actionId]: {
