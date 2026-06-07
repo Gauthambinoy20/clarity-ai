@@ -330,9 +330,7 @@ async def _run_full_detection(
                 attribution = {
                     "likely_model": likely,
                     "model_confidence": model_probs.get(likely, 0.0),
-                    "all_model_scores": [
-                        {"model": m, "score": p} for m, p in model_probs.items()
-                    ],
+                    "all_model_scores": [{"model": m, "score": p} for m, p in model_probs.items()],
                 }
                 break
 
