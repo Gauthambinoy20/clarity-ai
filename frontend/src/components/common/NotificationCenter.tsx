@@ -95,7 +95,7 @@ export default function NotificationCenter() {
 
   return (
     <>
-      <IconButton color="inherit" onClick={handleOpen}>
+      <IconButton color="inherit" aria-label="Notifications" onClick={handleOpen}>
         <Badge
           badgeContent={unreadCount}
           color="error"

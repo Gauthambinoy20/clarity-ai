@@ -92,6 +92,15 @@ export const darkTheme = createTheme({
         },
       },
     },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          // brand purple sits at ~3.1:1 on the dark paper; the light
+          // variant clears WCAG AA for selected tab labels
+          "&.Mui-selected": { color: "#a78bfa" },
+        },
+      },
+    },
     MuiDrawer: {
       styleOverrides: {
         paper: {
@@ -137,6 +146,14 @@ export const lightTheme = createTheme({
           backgroundImage: "none",
           border: "1px solid #e4e4e7",
           backgroundColor: "#ffffff",
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          // brand purple is ~4.1:1 on white; the dark variant clears AA
+          "&.Mui-selected": { color: "#5b21b6" },
         },
       },
     },

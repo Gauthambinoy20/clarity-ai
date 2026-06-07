@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -30,14 +31,16 @@ import BatchPredictionOutlinedIcon from "@mui/icons-material/BatchPredictionOutl
 import { AnimatePresence } from "framer-motion";
 import { useAppStore } from "@/stores/appStore";
 
-import DetectPage from "@/pages/DetectPage";
-import PlagiarismPage from "@/pages/PlagiarismPage";
-import HumanizePage from "@/pages/HumanizePage";
-import HistoryPage from "@/pages/HistoryPage";
-import AnalyticsPage from "@/pages/AnalyticsPage";
-import ComparePage from "@/pages/ComparePage";
-import DashboardPage from "@/pages/DashboardPage";
-import BatchPage from "@/pages/BatchPage";
+// Route-level code splitting: the landing page ships without dragging
+// every chart-heavy page into the initial bundle.
+const DetectPage = lazy(() => import("@/pages/DetectPage"));
+const PlagiarismPage = lazy(() => import("@/pages/PlagiarismPage"));
+const HumanizePage = lazy(() => import("@/pages/HumanizePage"));
+const HistoryPage = lazy(() => import("@/pages/HistoryPage"));
+const AnalyticsPage = lazy(() => import("@/pages/AnalyticsPage"));
+const ComparePage = lazy(() => import("@/pages/ComparePage"));
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const BatchPage = lazy(() => import("@/pages/BatchPage"));
 import FloatingActionMenu from "@/components/common/FloatingActionMenu";
 import NotificationCenter from "@/components/common/NotificationCenter";
 
@@ -210,13 +213,22 @@ export default function App() {
         >
           <Toolbar>
             {isMobile && (
-              <IconButton edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 1 }}>
+              <IconButton
+                edge="start"
+                aria-label="Open navigation"
+                onClick={() => setDrawerOpen(true)}
+                sx={{ mr: 1 }}
+              >
                 <MenuIcon />
               </IconButton>
             )}
             <Box sx={{ flex: 1 }} />
             <NotificationCenter />
-            <IconButton onClick={toggleTheme} color="inherit">
+            <IconButton
+              onClick={toggleTheme}
+              color="inherit"
+              aria-label={themeMode === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            >
               {themeMode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
           </Toolbar>
@@ -231,16 +243,18 @@ export default function App() {
           }}
         >
           <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<DetectPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/plagiarism" element={<PlagiarismPage />} />
-              <Route path="/humanize" element={<HumanizePage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
-              <Route path="/compare" element={<ComparePage />} />
-              <Route path="/batch" element={<BatchPage />} />
-              <Route path="/history" element={<HistoryPage />} />
-            </Routes>
+            <Suspense fallback={null}>
+              <Routes>
+                <Route path="/" element={<DetectPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/plagiarism" element={<PlagiarismPage />} />
+                <Route path="/humanize" element={<HumanizePage />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
+                <Route path="/compare" element={<ComparePage />} />
+                <Route path="/batch" element={<BatchPage />} />
+                <Route path="/history" element={<HistoryPage />} />
+              </Routes>
+            </Suspense>
           </AnimatePresence>
         </Box>
 
