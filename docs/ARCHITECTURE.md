@@ -1,309 +1,293 @@
 # ClarityAI Architecture
 
-This document describes the internal architecture of ClarityAI — how the ML detection pipeline works, how the backend is structured, how the frontend is organised, the database schema, and how the application can be deployed on free tiers.
+How the system fits together, derived from the code in this repository.
+Each diagram names real modules, routes and tables — if it's in a box here,
+you can find it in the tree.
 
-ClarityAI reports probabilistic writing signals. It is designed for portfolio demonstration, editorial triage, and NLP experimentation, not definitive authorship attribution.
+ClarityAI reports probabilistic writing signals. It is designed for portfolio
+demonstration, editorial triage, and NLP experimentation, not definitive
+authorship attribution.
 
----
+## 1. System architecture
 
-## Table of Contents
+All components and how they connect. The frontend is a static React build
+served by nginx; the backend is a single FastAPI service that owns the ML
+pipeline, the database and the websocket.
 
-1. [Overview](#overview)
-2. [ML Detection Pipeline](#ml-detection-pipeline)
-3. [FastAPI Backend Structure](#fastapi-backend-structure)
-4. [Frontend React Architecture](#frontend-react-architecture)
-5. [Database Design](#database-design)
-6. [Deployment Architecture](#deployment-architecture)
+```mermaid
+flowchart LR
+    subgraph Client
+        B[Browser]
+    end
 
----
+    subgraph Frontend["frontend/ (React 18 + MUI, nginx)"]
+        UI["8 pages<br/>Detect · Analytics · Plagiarism · Humanize<br/>Batch · Compare · History · Dashboard"]
+        API["src/utils/api.ts<br/>axios client"]
+    end
 
-## Overview
+    subgraph Backend["backend/app (FastAPI)"]
+        RT["api/routes/*<br/>detection · analytics · dashboard · plagiarism<br/>humanization · export · advanced · realtime · health"]
+        RL[core/rate_limiter.py]
+        WS[core/websocket.py]
+        subgraph ML["app/ml"]
+            DET["detectors/ — 19 signals"]
+            ENS[ensemble/meta_learner.py]
+            ANA["analyzers/ — 17 modules"]
+            HUM[humanizer/ pipeline]
+            PLAG[plagiarism/ pipeline]
+            REG[models/model_registry.py]
+        end
+        DB[("SQLite via<br/>SQLAlchemy async")]
+    end
 
-ClarityAI is a full-stack monorepo composed of:
+    HF[("Hugging Face hub<br/>gpt2 · distilgpt2 · gpt2-medium<br/>RoBERTa detector heads")]
+    OL["Ollama — optional<br/>local rewrite model"]
 
-- **`backend/`** — Python 3.12 + FastAPI application hosting 41 REST/WebSocket endpoints and all ML logic.
-- **`frontend/`** — React 18 + TypeScript + Vite SPA with MUI v6 UI.
-- **`docker-compose.yml`** — Orchestrates both services for local development.
-
-```
-ClarityAI/
-├── backend/
-│   ├── app/
-│   │   ├── main.py          # App factory + lifespan hook
-│   │   ├── core/            # Config (pydantic-settings), rate limiter, WebSocket manager
-│   │   ├── db/              # SQLAlchemy ORM, async engine, table models
-│   │   ├── api/routes/      # 10 router modules covering 41 endpoints
-│   │   └── ml/
-│   │       ├── detectors/   # 17 individual signal detectors
-│   │       ├── ensemble/    # Stacked meta-learner (weighted average + optional sklearn model)
-│   │       ├── humanizer/   # 3-layer adversarial humanization pipeline
-│   │       ├── plagiarism/  # Winnowing + semantic match + source discovery
-│   │       └── analyzers/   # 12 analytics modules (readability, tone, grammar, SEO, etc.)
-│   ├── tests/               # pytest test suite
-│   ├── requirements.txt
-│   ├── requirements-dev.txt
-│   └── pyproject.toml
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/           # 8 top-level page components
-│   │   ├── components/      # 37 reusable components organised by feature
-│   │   ├── hooks/           # 6 custom React hooks
-│   │   ├── stores/          # Zustand global state
-│   │   ├── types/           # TypeScript interfaces for analysis + analytics
-│   │   ├── utils/api.ts     # Axios instance + all API call functions
-│   │   └── theme/           # MUI theme config (dark + light)
-│   └── package.json
-│
-├── .github/workflows/       # CI (ci.yml) and deploy (deploy.yml)
-└── docker-compose.yml
+    B --> UI --> API --> RT
+    B -. "ws /ws/detect" .-> WS
+    RT --> RL
+    RT --> DET & ANA & HUM & PLAG
+    DET --> ENS
+    DET & ANA --> REG
+    REG -. "first use, then cached" .-> HF
+    HUM -. http .-> OL
+    RT --> DB
 ```
 
----
+## 2. Data flow (DFD)
 
-## ML Detection Pipeline
+Where a piece of user text travels, from input to stored result.
 
-### Signal Architecture
-
-The detection system is built around 17 independent signals, each implemented as a subclass of `BaseDetector` in `backend/app/ml/detectors/`. Every detector implements a single async method:
-
-```python
-async def analyze(self, text: str) -> dict:
-    # Must return: signal, ai_probability (0-1), confidence, details
+```mermaid
+flowchart TD
+    SRC([User text / file upload]) --> VAL{"Validation<br/>pydantic schema +<br/>MIN_WORDS/MAX_WORDS"}
+    VAL -- reject --> ERR([422 with clear message])
+    VAL -- accept --> RLIM{Rate limiter}
+    RLIM -- over budget --> R429([429])
+    RLIM -- ok --> FAN["Detector fan-out<br/>asyncio.gather over roster"]
+    FAN --> BRIDGE["_bridge_signals<br/>name translation"]
+    BRIDGE --> META["EnsembleMetaLearner.predict<br/>weighted features + watermark override"]
+    META --> CLS[classification + confidence]
+    FAN --> VIZ["per-signal details<br/>GLTR token_data · heatmap · attribution"]
+    CLS --> STORE[(analyses table)]
+    VIZ --> STORE
+    STORE --> RESP([JSON response])
+    STORE --> EXP["export/ PDF · JSON · CSV · share links"]
+    STORE --> DASH["dashboard/ stats · trends · top signals"]
 ```
 
-The 17 signals fall into four categories:
+## 3. Sequence — the /detect request lifecycle
 
-| Category | Detectors |
-|---|---|
-| **Language model statistics** | Perplexity + Burstiness, Fast-DetectGPT, Binoculars, Ghostbuster, GLTR |
-| **Zero-shot classifiers** | Zero-Shot Ensemble (3 RoBERTa models), Watermark Detection |
-| **Linguistic / stylometric** | Stylometrics, Entropy Analyzer, Vocabulary Richness, POS Patterns, Repetition, Coherence |
-| **Pattern matching** | AI Fingerprint, AI Pattern Database, Cross-Reference, Rewrite Detector |
+The core path of the product, as implemented in
+`api/routes/detection.py::_run_full_detection`.
 
-### Ensemble Meta-Learner
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant R as detection.py
+    participant Reg as ModelRegistry
+    participant D as 14 detectors
+    participant E as EnsembleMetaLearner
+    participant DB as SQLite
 
-`backend/app/ml/ensemble/meta_learner.py` combines all signals into a single score via a weighted-average stacking approach:
-
-1. Each detector returns an `ai_probability` (0.0–1.0).
-2. The meta-learner builds a feature vector using `DEFAULT_WEIGHTS` (per-signal weights tuned against a validation set).
-3. Interaction features are computed for three high-signal pairs: (detectgpt, binoculars), (stylometric, entropy), (perplexity, burstiness).
-4. If a trained sklearn model exists on disk it is used as a stacking estimator; otherwise the weighted average is returned directly.
-5. Classification thresholds: `>= 0.85` → AI Generated; `0.50–0.85` → Likely AI / Mixed; `< 0.50` → Human Written. These are product thresholds, not proof thresholds; teams should recalibrate against their own validation corpus.
-
-### Model Registry
-
-`backend/app/ml/models/model_registry.py` is a singleton that lazy-loads and caches HuggingFace models (GPT-2 variants, RoBERTa classifiers, sentence-transformers) and the spaCy pipeline. Models are loaded on first use and unloaded on application shutdown.
-
-### Humanization Pipeline
-
-`backend/app/ml/humanizer/pipeline.py` runs an adversarial feedback loop:
-
-1. **Layer 1 — Lexical** (`lexical_humanizer.py`): Replaces AI buzzwords, expands contractions, removes AI phrase patterns.
-2. **Layer 2 — Structural** (`structural_humanizer.py`): Varies sentence length, inserts hedging language, adds fragments.
-3. **Layer 3 — Ollama LLM** (`ollama_humanizer.py`): Sends text to a local Mistral-7B instance with a humanization prompt.
-4. **Adversarial loop**: After each pass the text is re-scored. If the AI score is still above the target threshold (default 0.10) the pipeline repeats layers 2–3 with increasing temperature (up to 5 iterations).
-5. **Post-check**: Meaning preservation is measured via cosine similarity of sentence embeddings.
-
----
-
-## FastAPI Backend Structure
-
-### Application Factory
-
-`app/main.py` exposes a `create_app()` factory following the application factory pattern. The `lifespan` context manager handles:
-- Database table creation (`init_db()`)
-- NLTK data download
-- Upload directory creation
-- Model registry teardown on shutdown
-
-### Router Layout
-
-All routers are mounted under `/api/v1`:
-
-| Module | Prefix | Key Endpoints |
-|---|---|---|
-| `health.py` | `/api/v1` | `GET /health`, `GET /history` |
-| `detection.py` | `/api/v1` | `POST /detect`, `POST /detect/fast`, `POST /detect/batch` |
-| `plagiarism.py` | `/api/v1` | `POST /plagiarism` |
-| `humanization.py` | `/api/v1` | `POST /humanize`, `GET /models` |
-| `analytics.py` | `/api/v1/analytics` | 10 analytics sub-endpoints |
-| `advanced.py` | `/api/v1/advanced` | Fingerprint, version tracking, batch, coach |
-| `dashboard.py` | `/api/v1/dashboard` | Stats, trends, top signals |
-| `export.py` | `/api/v1/export` | PDF, JSON, CSV, share link |
-| `realtime.py` | `/ws` | `WS /ws/detect` (WebSocket) |
-
-### Rate Limiting
-
-Implemented in `app/core/rate_limiter.py`. Default: 20 requests per IP per hour with a burst allowance of 5.
-
-### Configuration
-
-All settings live in `app/core/config.py` as a pydantic-settings `Settings` class. Values are read from environment variables or `.env` file, with sensible defaults for local development.
-
----
-
-## Frontend React Architecture
-
-### Routing
-
-React Router v7 handles navigation across 8 pages:
-
-| Page | Route | Description |
-|---|---|---|
-| `DetectPage` | `/` | Main AI detection interface |
-| `PlagiarismPage` | `/plagiarism` | Plagiarism checker |
-| `HumanizePage` | `/humanize` | Humanization studio |
-| `AnalyticsPage` | `/analytics` | 9-tab analytics suite |
-| `DashboardPage` | `/dashboard` | Usage stats and trends |
-| `BatchPage` | `/batch` | Multi-file batch processor |
-| `ComparePage` | `/compare` | Side-by-side text comparison |
-| `HistoryPage` | `/history` | Analysis history with pagination |
-
-### State Management
-
-**Zustand** (`src/stores/appStore.ts`) manages global UI state:
-- Theme mode (dark / light, persisted to `localStorage`)
-- Current detection / plagiarism / humanization results
-- Loading flag (`isAnalyzing`)
-- Drawer open state
-- Notification queue
-
-**TanStack Query** manages server state for data fetching (caching, background refetching, loading/error states).
-
-### Component Organisation
-
-```
-src/components/
-├── analysis/        # SentenceHeatmap, SignalBreakdown, GLTRVisualization, SignalRadar
-├── analytics/       # ReadabilityPanel, ToneAnalyzer, GrammarChecker, SEOAnalyzer, etc.
-├── advanced/        # BatchProcessor, LiveTypingDetector, RewriteDetector, VersionHistory
-├── common/          # ScoreGauge, LoadingProgress, ExportMenu, NotificationCenter
-├── dashboard/       # DashboardPage (stats overview)
-├── humanizer/       # HumanizerPanel
-├── input/           # TextInput, FileUpload
-└── plagiarism/      # PlagiarismReport
+    C->>R: POST /api/v1/detect {text, mode, options}
+    R->>R: word-count guard (422 if out of range)
+    R->>D: asyncio.gather(_run_detector × roster)
+    D->>Reg: get_model("gpt2" / roberta heads)
+    Reg-->>D: cached model (downloads once)
+    Note over D: a failing detector degrades to a<br/>flagged neutral result, never raises
+    D-->>R: signal results
+    R->>E: predict(_bridge_signals(results))
+    E-->>R: overall_score + interpretation
+    R->>DB: INSERT analyses row (signals as JSON)
+    R-->>C: score, classification, signals,<br/>sentence heatmap, GLTR tokens, attribution
 ```
 
-### API Layer
+## 4. Sequence — humanize and plagiarism (compact)
 
-All backend communication goes through `src/utils/api.ts`, which exports a configured Axios instance plus individual typed async functions for every endpoint. The error interceptor normalises error messages from FastAPI's `detail` field.
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant H as humanization.py
+    participant P as plagiarism.py
+    participant OL as Ollama (optional)
+    participant DB as SQLite
 
-### Theming
+    C->>H: POST /api/v1/humanize
+    H->>H: rule-based stages (lexical → structural → targeted)
+    H->>OL: rewrite request (if configured)
+    OL-->>H: rewritten text (or unavailable → rule-based only)
+    H->>DB: humanization_results row
+    H-->>C: before/after + score delta
 
-MUI v6 theme is defined in `src/theme/theme.ts` and supports full dark/light mode switching. The active theme mode is toggled via `useAppStore` and applied at the root `App.tsx` level via `ThemeProvider`.
-
----
-
-## Database Design
-
-ClarityAI uses **SQLite** with `aiosqlite` for async access. The schema is managed by SQLAlchemy ORM (no migrations — tables are created on startup via `Base.metadata.create_all`).
-
-### Tables
-
-#### `analyses`
-
-Stores every AI-detection run.
-
-| Column | Type | Description |
-|---|---|---|
-| `id` | `VARCHAR(32)` PK | UUID hex string |
-| `input_text` | `TEXT` | Raw input text |
-| `word_count` | `INTEGER` | Number of words |
-| `overall_ai_score` | `FLOAT` | Ensemble score (0–1) |
-| `classification` | `VARCHAR(32)` | `ai_generated`, `human_written`, `mixed` |
-| `confidence` | `FLOAT` | Meta-learner confidence |
-| `signals_json` | `TEXT` | JSON array of per-signal results |
-| `sentence_scores_json` | `TEXT` | JSON array of sentence-level scores |
-| `gltr_data_json` | `TEXT` | GLTR token probability data |
-| `attribution_model` | `VARCHAR(128)` | Best-guess generating model |
-| `processing_time_ms` | `INTEGER` | End-to-end latency |
-| `model_version` | `VARCHAR(64)` | App version at time of analysis |
-| `created_at` | `DATETIME` | UTC timestamp |
-
-#### `plagiarism_results`
-
-One row per matched source, linked to `analyses`.
-
-| Column | Type | Description |
-|---|---|---|
-| `id` | `VARCHAR(32)` PK | UUID hex |
-| `analysis_id` | FK → `analyses.id` | Parent analysis |
-| `source_url` | `TEXT` | Matched source URL |
-| `source_title` | `VARCHAR(512)` | Page title |
-| `matched_text` | `TEXT` | The overlapping passage |
-| `similarity_score` | `FLOAT` | Semantic similarity (0–1) |
-| `method` | `VARCHAR(64)` | `semantic`, `exact`, `fuzzy` |
-
-#### `humanization_results`
-
-Stores humanization rewrites linked to analyses.
-
-#### `batch_jobs`
-
-Tracks multi-file batch processing jobs with status (`pending`, `processing`, `completed`, `failed`), file counts, and JSON results.
-
-#### `analytics_results`
-
-Stores analytics analysis results (readability, tone, grammar, etc.) independently from detection analyses.
-
-#### `api_usage`
-
-Per-request log for rate limiting and usage analytics. Stores client IP, endpoint, method, status code, and response time.
-
-### SQLite Optimisations
-
-On every new connection, three PRAGMAs are applied:
-- `PRAGMA journal_mode=WAL` — Write-Ahead Logging for concurrent reads
-- `PRAGMA foreign_keys=ON` — Enforce referential integrity
-- `PRAGMA synchronous=NORMAL` — Balance durability vs. write speed
-
----
-
-## Deployment Architecture
-
-### Local Development
-
-```
-Browser (localhost:5173)
-        |
-   Vite Dev Server  ──────────→  FastAPI (localhost:8000)
-        |                               |
-  React hot-reload             SQLite + ML models
-                                        |
-                            Ollama (localhost:11434)  [optional]
+    C->>P: POST /api/v1/plagiarism
+    P->>P: exact n-gram match (cheap, first)
+    P->>P: semantic embedding match (gated)
+    P->>P: source discovery (network, last)
+    P->>DB: plagiarism_results rows
+    P-->>C: matches + sources
 ```
 
-### Production (Current Target)
+## 5. Entity-relationship
 
+Six tables; JSON payloads live in TEXT columns because SQLite has no native
+JSON type.
+
+```mermaid
+erDiagram
+    analyses ||--o{ plagiarism_results : "analysis_id (CASCADE)"
+    analyses ||--o{ humanization_results : "analysis_id (CASCADE)"
+
+    analyses {
+        string id PK
+        text input_text
+        int word_count
+        float overall_ai_score
+        string classification
+        float confidence
+        text signals_json
+        text sentence_scores_json
+        text gltr_data_json
+        string attribution_model
+        int processing_time_ms
+        string model_version
+        datetime created_at
+    }
+    plagiarism_results {
+        string id PK
+        string analysis_id FK
+        text source_url
+        string source_title
+        text matched_text
+        float similarity_score
+        string method
+        text details_json
+        datetime created_at
+    }
+    humanization_results {
+        string id PK
+        string analysis_id FK
+        text original_text
+        text humanized_text
+        float original_ai_score
+        float humanized_ai_score
+        int iterations_used
+        string strategy
+        int processing_time_ms
+        datetime created_at
+    }
+    batch_jobs {
+        string id PK
+        string status
+        int total_files
+        int processed_files
+        int failed_files
+        text results_json
+        text error_message
+        datetime started_at
+        datetime completed_at
+        datetime created_at
+    }
+    analytics_results {
+        string id PK
+        string analysis_type
+        text input_text
+        text results_json
+        int processing_time_ms
+        datetime created_at
+    }
+    api_usage {
+        int id PK
+        string client_ip
+        string endpoint
+        string method
+        int status_code
+        int response_time_ms
+        int request_size_bytes
+        string api_key_hash
+        datetime created_at
+    }
 ```
-User Browser
-     |
-  Vercel CDN  (frontend — React SPA, static build)
-     |
-  API requests  →  HuggingFace Spaces / Render  (backend — Docker)
-                          |
-                    Persistent SQLite volume
+
+## 6. Module map (backend)
+
+Internal dependency direction — routes orchestrate, ml computes, core and db
+support. Nothing in `ml/` imports from `api/`.
+
+```mermaid
+flowchart TD
+    MAIN[app/main.py] --> ROUTES[api/routes/*]
+    MAIN --> CFG[core/config.py]
+    ROUTES --> CFG
+    ROUTES --> RL[core/rate_limiter.py]
+    ROUTES --> WSM[core/websocket.py]
+    ROUTES --> DBM[db/database.py + db/models.py]
+    ROUTES --> DET[ml/detectors/*]
+    ROUTES --> ANA[ml/analyzers/*]
+    ROUTES --> HUM[ml/humanizer/*]
+    ROUTES --> PLG[ml/plagiarism/*]
+    ROUTES --> ENS[ml/ensemble/meta_learner.py]
+    DET --> BASE[ml/detectors/base.py]
+    DET --> REG[ml/models/model_registry.py]
+    ANA --> REG
+    REG --> CFG
 ```
 
-#### Frontend — Vercel
+## 7. State machine — batch jobs
 
-The Vite build output (`frontend/dist/`) is deployed to Vercel as a static site. `vercel.json` rewrites all routes to `index.html` for SPA routing and proxies `/api/*` to the hosted backend. Alternatively, set `VITE_API_URL` to a backend API root such as `https://your-backend.example.com/api/v1`.
+From `db/models.py::BatchJob` and the batch path in
+`api/routes/detection.py`.
 
-#### Backend — HuggingFace Spaces or Render
+```mermaid
+stateDiagram-v2
+    [*] --> pending : POST /detect/batch
+    pending --> processing : background task starts (started_at set)
+    processing --> processing : per-item result appended
+    processing --> completed : all items done (completed_at set)
+    processing --> failed : unrecoverable error (error_message set)
+    completed --> [*]
+    failed --> [*]
+```
 
-The `backend/Dockerfile` builds a self-contained image with Python, all pip dependencies, spaCy model, NLTK data, and `curl` for container health checks. The container exposes port 8000. CORS origins are configured via `CORS_ORIGINS` to allow the Vercel frontend domain.
+## 8. Trust boundaries
 
-#### Docker Compose (self-hosted)
+Where untrusted input is validated and what the service trusts.
 
-`docker-compose.yml` at the repo root orchestrates both services. The backend mounts a named volume for the SQLite database so data persists across container restarts.
+```mermaid
+flowchart LR
+    subgraph Untrusted
+        U1[User text]
+        U2["File uploads<br/>PDF · DOCX · TXT"]
+        U3[Share tokens from URLs]
+        U4[Websocket messages]
+    end
 
-### CI/CD
+    subgraph Validation["Validation layer"]
+        V1["pydantic schemas<br/>length + type bounds"]
+        V2["upload type/size limits"]
+        V3["token lookup — 404 on miss"]
+        V4["JSON parse with error reply"]
+        RL2[rate limiter per client]
+    end
 
-`.github/workflows/ci.yml` runs on every push/PR to `main`:
+    subgraph Trusted["Trusted internals"]
+        T1[ML pipeline]
+        T2[(SQLite)]
+    end
 
-1. **Backend**: installs dependencies, runs `ruff` lint, runs `black --check`, then `pytest tests/ --cov=app --cov-fail-under=20`
-2. **Frontend**: installs with `npm ci`, runs `vitest`, then `vite build`
-3. **Docker**: builds the backend image and smoke-tests the `/api/v1/health` endpoint
+    subgraph External["External (supply chain)"]
+        E1["Hugging Face model downloads<br/>pinned ids in core/config.py"]
+        E2[Ollama on localhost]
+    end
 
-`.github/workflows/deploy.yml` triggers on push to `main` and deploys frontend to Vercel and backend to Render when the relevant secrets are configured. Without secrets, it safely skips deployment.
+    U1 --> V1 --> RL2 --> T1
+    U2 --> V2 --> T1
+    U3 --> V3 --> T2
+    U4 --> V4 --> T1
+    T1 --> T2
+    T1 -. model load .-> E1
+    T1 -. rewrite .-> E2
+```
+
+> The deployment/infrastructure diagram is added alongside the Terraform
+> code in `infra/` so it documents what is actually provisioned.
