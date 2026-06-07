@@ -4,6 +4,15 @@ Shared pytest fixtures for ClarityAI backend tests.
 
 from __future__ import annotations
 
+import os
+import tempfile
+
+# Point the app at a throwaway database BEFORE anything imports
+# app.core.config — settings are read once at import time, so setting
+# this inside a fixture is too late and tests end up on the real DB.
+_TEST_DB_DIR = tempfile.mkdtemp(prefix="clarityai-test-")
+os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{_TEST_DB_DIR}/test.db"
+
 import pytest
 from httpx import AsyncClient, ASGITransport
 
@@ -55,13 +64,8 @@ SHORT_TEXT = "Hello world."
 async def client():
     """Async test client for the ClarityAI FastAPI app.
 
-    Uses an in-memory SQLite database so tests don't touch the real DB.
+    Runs against the throwaway test database configured at module import.
     """
-    import os
-
-    # Point to an in-memory DB for tests
-    os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
-
     from app.main import create_app
     from app.db.database import init_db
 
