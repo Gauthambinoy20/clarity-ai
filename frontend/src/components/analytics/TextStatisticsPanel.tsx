@@ -23,6 +23,7 @@ import {
   Pie,
   Cell,
   Legend,
+  CartesianGrid,
 } from "recharts";
 import WordCloud from "@/components/common/WordCloud";
 import type { TextStatistics } from "@/types/analytics";

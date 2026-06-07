@@ -18,6 +18,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  CartesianGrid,
 } from "recharts";
 import type { ReadabilityResult } from "@/types/analytics";
 

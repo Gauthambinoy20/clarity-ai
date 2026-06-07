@@ -34,6 +34,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  CartesianGrid,
 } from "recharts";
 import {
   getDashboardStats,
