@@ -1,0 +1,46 @@
+{
+  "analysis_id": "demo-2026-portfolio",
+  "overall_score": 0.73,
+  "classification": "mixed",
+  "confidence": "medium",
+  "word_count": 184,
+  "processing_time_ms": 842,
+  "model_version": "1.0.0",
+  "signals": [
+    {
+      "signal": "gltr",
+      "ai_probability": 0.81,
+      "confidence": "medium",
+      "details": {
+        "green_token_ratio": 0.68,
+        "interpretation": "Many tokens appear in high-probability language-model bands."
+      }
+    },
+    {
+      "signal": "repetition",
+      "ai_probability": 0.64,
+      "confidence": "medium",
+      "details": {
+        "sentence_opener_diversity": 0.72,
+        "over_variation_score": 0.5
+      }
+    },
+    {
+      "signal": "entropy_analyzer",
+      "ai_probability": 0.58,
+      "confidence": "low",
+      "details": {
+        "buzzword_density": 0.04,
+        "word_entropy": 4.91
+      }
+    }
+  ],
+  "sentence_analysis": [
+    {
+      "sentence": "This section uses polished transition phrases and evenly balanced sentence structure.",
+      "ai_probability": 0.78,
+      "highlight": "medium"
+    }
+  ],
+  "recommended_action": "Use the score as an editorial signal. Review highlighted sentences and compare against source context before making decisions."
+}
