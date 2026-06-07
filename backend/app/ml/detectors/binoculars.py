@@ -48,35 +48,39 @@ class BinocularsDetector(BaseDetector):
         if len(text.split()) < 10:
             return self._empty_result(signal, "text too short (< 10 words)")
 
-        obs_tok, obs_model = await ModelRegistry.get_model("distilgpt2")
-        perf_tok, perf_model = await ModelRegistry.get_model("gpt2")
+        try:
+            obs_tok, obs_model = await ModelRegistry.get_model("distilgpt2")
+            perf_tok, perf_model = await ModelRegistry.get_model("gpt2")
 
-        observer_ce = self._cross_entropy(text, obs_model, obs_tok)
-        performer_ce = self._cross_entropy(text, perf_model, perf_tok)
+            observer_ce = self._cross_entropy(text, obs_model, obs_tok)
+            performer_ce = self._cross_entropy(text, perf_model, perf_tok)
 
-        ratio = observer_ce / performer_ce if performer_ce > 1e-8 else 1.0
+            ratio = observer_ce / performer_ce if performer_ce > 1e-8 else 1.0
 
-        if ratio <= THRESHOLD_AI:
-            ai_prob = self._clamp(0.7 + 0.3 * (THRESHOLD_AI - ratio) / THRESHOLD_AI)
-        elif ratio >= THRESHOLD_HUMAN:
-            ai_prob = self._clamp(0.3 - 0.3 * (ratio - THRESHOLD_HUMAN) / THRESHOLD_HUMAN)
-        else:
-            ai_prob = self._clamp(
-                0.7 - 0.4 * (ratio - THRESHOLD_AI) / (THRESHOLD_HUMAN - THRESHOLD_AI)
-            )
+            if ratio <= THRESHOLD_AI:
+                ai_prob = self._clamp(0.7 + 0.3 * (THRESHOLD_AI - ratio) / THRESHOLD_AI)
+            elif ratio >= THRESHOLD_HUMAN:
+                ai_prob = self._clamp(0.3 - 0.3 * (ratio - THRESHOLD_HUMAN) / THRESHOLD_HUMAN)
+            else:
+                ai_prob = self._clamp(
+                    0.7 - 0.4 * (ratio - THRESHOLD_AI) / (THRESHOLD_HUMAN - THRESHOLD_AI)
+                )
 
-        dist = abs(ratio - 0.95)
-        confidence = "high" if dist > 0.2 else "medium" if dist > 0.1 else "low"
+            dist = abs(ratio - 0.95)
+            confidence = "high" if dist > 0.2 else "medium" if dist > 0.1 else "low"
 
-        return {
-            "signal": signal,
-            "ai_probability": round(ai_prob, 4),
-            "confidence": confidence,
-            "details": {
-                "observer_cross_entropy": round(observer_ce, 4),
-                "performer_cross_entropy": round(performer_ce, 4),
-                "binoculars_ratio": round(ratio, 4),
-                "threshold_ai": THRESHOLD_AI,
-                "threshold_human": THRESHOLD_HUMAN,
-            },
-        }
+            return {
+                "signal": signal,
+                "ai_probability": round(ai_prob, 4),
+                "confidence": confidence,
+                "details": {
+                    "observer_cross_entropy": round(observer_ce, 4),
+                    "performer_cross_entropy": round(performer_ce, 4),
+                    "binoculars_ratio": round(ratio, 4),
+                    "threshold_ai": THRESHOLD_AI,
+                    "threshold_human": THRESHOLD_HUMAN,
+                },
+            }
+        except Exception as exc:
+            logger.warning("%s degraded: %s", signal, exc)
+            return self._empty_result(signal, f"analysis failed: {exc}")

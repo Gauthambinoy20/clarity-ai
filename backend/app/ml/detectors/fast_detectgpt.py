@@ -85,35 +85,39 @@ class FastDetectGPTDetector(BaseDetector):
         if len(text.split()) < 10:
             return self._empty_result(signal, "text too short (< 10 words)")
 
-        tokenizer, model = await ModelRegistry.get_model("gpt2")
+        try:
+            tokenizer, model = await ModelRegistry.get_model("gpt2")
 
-        original_lp = self._log_probability(text, model, tokenizer)
-        sampled_lps = self._sample_perturbed_logprobs(
-            text,
-            model,
-            tokenizer,
-            NUM_SAMPLES,
-        )
+            original_lp = self._log_probability(text, model, tokenizer)
+            sampled_lps = self._sample_perturbed_logprobs(
+                text,
+                model,
+                tokenizer,
+                NUM_SAMPLES,
+            )
 
-        mu = float(np.mean(sampled_lps))
-        sigma = max(float(np.std(sampled_lps)), 1e-8)
+            mu = float(np.mean(sampled_lps))
+            sigma = max(float(np.std(sampled_lps)), 1e-8)
 
-        discrepancy = (original_lp - mu) / sigma
-        ai_prob = self._clamp(self._sigmoid(discrepancy * 1.5))
+            discrepancy = (original_lp - mu) / sigma
+            ai_prob = self._clamp(self._sigmoid(discrepancy * 1.5))
 
-        sample_cv = sigma / (abs(mu) + 1e-8)
-        conf_score = self._clamp(1.0 - sample_cv)
-        confidence = "high" if conf_score > 0.7 else "medium" if conf_score > 0.4 else "low"
+            sample_cv = sigma / (abs(mu) + 1e-8)
+            conf_score = self._clamp(1.0 - sample_cv)
+            confidence = "high" if conf_score > 0.7 else "medium" if conf_score > 0.4 else "low"
 
-        return {
-            "signal": signal,
-            "ai_probability": round(ai_prob, 4),
-            "confidence": confidence,
-            "details": {
-                "original_log_prob": round(original_lp, 4),
-                "perturbation_mean_log_prob": round(mu, 4),
-                "perturbation_std": round(sigma, 4),
-                "normalized_discrepancy": round(discrepancy, 4),
-                "num_samples": NUM_SAMPLES,
-            },
-        }
+            return {
+                "signal": signal,
+                "ai_probability": round(ai_prob, 4),
+                "confidence": confidence,
+                "details": {
+                    "original_log_prob": round(original_lp, 4),
+                    "perturbation_mean_log_prob": round(mu, 4),
+                    "perturbation_std": round(sigma, 4),
+                    "normalized_discrepancy": round(discrepancy, 4),
+                    "num_samples": NUM_SAMPLES,
+                },
+            }
+        except Exception as exc:
+            logger.warning("%s degraded: %s", signal, exc)
+            return self._empty_result(signal, f"analysis failed: {exc}")

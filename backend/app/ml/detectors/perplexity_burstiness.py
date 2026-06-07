@@ -95,53 +95,57 @@ class PerplexityBurstinessDetector(BaseDetector):
         if len(sentences) < 3:
             return self._empty_result(signal, "need >= 3 sentences")
 
-        tokenizer, model = await ModelRegistry.get_model("gpt2")
+        try:
+            tokenizer, model = await ModelRegistry.get_model("gpt2")
 
-        perplexities: List[float] = [
-            self._sentence_perplexity(s, model, tokenizer) for s in sentences
-        ]
+            perplexities: List[float] = [
+                self._sentence_perplexity(s, model, tokenizer) for s in sentences
+            ]
 
-        mean_ppl = float(np.mean(perplexities))
-        cv = self._coefficient_of_variation(perplexities)
-        goh = self._goh_barabasi_index(perplexities)
-        mem = self._sequential_memory(perplexities)
-        bimod = self._bimodality_coefficient(perplexities)
+            mean_ppl = float(np.mean(perplexities))
+            cv = self._coefficient_of_variation(perplexities)
+            goh = self._goh_barabasi_index(perplexities)
+            mem = self._sequential_memory(perplexities)
+            bimod = self._bimodality_coefficient(perplexities)
 
-        ppl_score = self._sigmoid(-(mean_ppl - 60) / 30)
-        cv_score = self._sigmoid(-(cv - 0.8) / 0.3)
-        goh_score = self._sigmoid(-(goh - 0.0) / 0.3)
-        mem_score = self._sigmoid((mem - 0.2) / 0.3)
-        bimod_score = self._sigmoid(-(bimod - 0.555) / 0.2)
+            ppl_score = self._sigmoid(-(mean_ppl - 60) / 30)
+            cv_score = self._sigmoid(-(cv - 0.8) / 0.3)
+            goh_score = self._sigmoid(-(goh - 0.0) / 0.3)
+            mem_score = self._sigmoid((mem - 0.2) / 0.3)
+            bimod_score = self._sigmoid(-(bimod - 0.555) / 0.2)
 
-        ai_prob = self._clamp(
-            0.30 * ppl_score
-            + 0.25 * cv_score
-            + 0.15 * goh_score
-            + 0.15 * mem_score
-            + 0.15 * bimod_score
-        )
-        confidence = self._compute_confidence(
-            [ppl_score, cv_score, goh_score, mem_score, bimod_score]
-        )
+            ai_prob = self._clamp(
+                0.30 * ppl_score
+                + 0.25 * cv_score
+                + 0.15 * goh_score
+                + 0.15 * mem_score
+                + 0.15 * bimod_score
+            )
+            confidence = self._compute_confidence(
+                [ppl_score, cv_score, goh_score, mem_score, bimod_score]
+            )
 
-        return {
-            "signal": signal,
-            "ai_probability": round(ai_prob, 4),
-            "confidence": confidence,
-            "details": {
-                "mean_perplexity": round(mean_ppl, 2),
-                "coefficient_of_variation": round(cv, 4),
-                "goh_barabasi_index": round(goh, 4),
-                "sequential_memory": round(mem, 4),
-                "bimodality_coefficient": round(bimod, 4),
-                "num_sentences": len(sentences),
-                "per_sentence_perplexity": [round(p, 2) for p in perplexities],
-            },
-            "sub_scores": {
-                "ppl_score": round(ppl_score, 4),
-                "cv_score": round(cv_score, 4),
-                "goh_score": round(goh_score, 4),
-                "mem_score": round(mem_score, 4),
-                "bimod_score": round(bimod_score, 4),
-            },
-        }
+            return {
+                "signal": signal,
+                "ai_probability": round(ai_prob, 4),
+                "confidence": confidence,
+                "details": {
+                    "mean_perplexity": round(mean_ppl, 2),
+                    "coefficient_of_variation": round(cv, 4),
+                    "goh_barabasi_index": round(goh, 4),
+                    "sequential_memory": round(mem, 4),
+                    "bimodality_coefficient": round(bimod, 4),
+                    "num_sentences": len(sentences),
+                    "per_sentence_perplexity": [round(p, 2) for p in perplexities],
+                },
+                "sub_scores": {
+                    "ppl_score": round(ppl_score, 4),
+                    "cv_score": round(cv_score, 4),
+                    "goh_score": round(goh_score, 4),
+                    "mem_score": round(mem_score, 4),
+                    "bimod_score": round(bimod_score, 4),
+                },
+            }
+        except Exception as exc:
+            logger.warning("%s degraded: %s", signal, exc)
+            return self._empty_result(signal, f"analysis failed: {exc}")

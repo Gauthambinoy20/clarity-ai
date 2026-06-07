@@ -156,33 +156,39 @@ class GhostbusterDetector(BaseDetector):
         if len(text.split()) < 10:
             return self._empty_result(signal, "text too short (< 10 words)")
 
-        features = await self._extract_features(text)
+        try:
+            features = await self._extract_features(text)
 
-        if self._classifier is not None:
-            try:
-                prob = self._classifier.predict_proba(features.reshape(1, -1))[0][1]
-                ai_prob = float(prob)
-                method = "gradient_boosting"
-            except Exception as exc:
-                logger.warning("Ghostbuster classifier failed: %s", exc)
+            if self._classifier is not None:
+                try:
+                    prob = self._classifier.predict_proba(features.reshape(1, -1))[0][1]
+                    ai_prob = float(prob)
+                    method = "gradient_boosting"
+                except Exception as exc:
+                    logger.warning("Ghostbuster classifier failed: %s", exc)
+                    ai_prob = self._fallback_score(features)
+                    method = "fallback_heuristic"
+            else:
                 ai_prob = self._fallback_score(features)
                 method = "fallback_heuristic"
-        else:
-            ai_prob = self._fallback_score(features)
-            method = "fallback_heuristic"
 
-        ai_prob = self._clamp(ai_prob)
-        confidence = (
-            "high" if abs(ai_prob - 0.5) > 0.3 else "medium" if abs(ai_prob - 0.5) > 0.15 else "low"
-        )
+            ai_prob = self._clamp(ai_prob)
+            confidence = (
+                "high"
+                if abs(ai_prob - 0.5) > 0.3
+                else "medium" if abs(ai_prob - 0.5) > 0.15 else "low"
+            )
 
-        return {
-            "signal": signal,
-            "ai_probability": round(ai_prob, 4),
-            "confidence": confidence,
-            "details": {
-                "method": method,
-                "num_features": len(features),
-                "feature_vector": [round(float(f), 4) for f in features],
-            },
-        }
+            return {
+                "signal": signal,
+                "ai_probability": round(ai_prob, 4),
+                "confidence": confidence,
+                "details": {
+                    "method": method,
+                    "num_features": len(features),
+                    "feature_vector": [round(float(f), 4) for f in features],
+                },
+            }
+        except Exception as exc:
+            logger.warning("%s degraded: %s", signal, exc)
+            return self._empty_result(signal, f"analysis failed: {exc}")

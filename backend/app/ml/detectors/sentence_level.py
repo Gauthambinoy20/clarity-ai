@@ -125,76 +125,80 @@ class SentenceLevelDetector(BaseDetector):
         if len(sentences) < 2:
             return self._empty_result(signal, "need >= 2 sentences")
 
-        tokenizer, model = await ModelRegistry.get_model("gpt2")
+        try:
+            tokenizer, model = await ModelRegistry.get_model("gpt2")
 
-        per_sentence: List[Dict] = []
-        ai_count = 0
-        human_count = 0
+            per_sentence: List[Dict] = []
+            ai_count = 0
+            human_count = 0
 
-        for idx, sent in enumerate(sentences):
-            ppl_score = self._sentence_perplexity_score(sent, model, tokenizer)
-            gltr_score = self._sentence_gltr_score(sent, model, tokenizer)
-            zs_score = await self._sentence_zeroshot_score(sent)
+            for idx, sent in enumerate(sentences):
+                ppl_score = self._sentence_perplexity_score(sent, model, tokenizer)
+                gltr_score = self._sentence_gltr_score(sent, model, tokenizer)
+                zs_score = await self._sentence_zeroshot_score(sent)
 
-            combined = 0.35 * ppl_score + 0.35 * gltr_score + 0.30 * zs_score
-            combined = max(0.0, min(1.0, combined))
+                combined = 0.35 * ppl_score + 0.35 * gltr_score + 0.30 * zs_score
+                combined = max(0.0, min(1.0, combined))
 
-            if combined >= AI_THRESHOLD:
-                label = "ai"
-                ai_count += 1
-            elif combined <= HUMAN_THRESHOLD:
-                label = "human"
-                human_count += 1
-            else:
-                label = "uncertain"
+                if combined >= AI_THRESHOLD:
+                    label = "ai"
+                    ai_count += 1
+                elif combined <= HUMAN_THRESHOLD:
+                    label = "human"
+                    human_count += 1
+                else:
+                    label = "uncertain"
 
-            per_sentence.append(
-                {
-                    "index": idx,
-                    "text": sent[:200],  # truncate for response size
-                    "ai_probability": round(combined, 4),
-                    "label": label,
-                    "sub_scores": {
-                        "perplexity": round(ppl_score, 4),
-                        "gltr": round(gltr_score, 4),
-                        "zero_shot": round(zs_score, 4),
-                    },
-                }
+                per_sentence.append(
+                    {
+                        "index": idx,
+                        "text": sent[:200],  # truncate for response size
+                        "ai_probability": round(combined, 4),
+                        "label": label,
+                        "sub_scores": {
+                            "perplexity": round(ppl_score, 4),
+                            "gltr": round(gltr_score, 4),
+                            "zero_shot": round(zs_score, 4),
+                        },
+                    }
+                )
+
+            total = len(sentences)
+            ai_pct = ai_count / total
+            human_pct = human_count / total
+            uncertain_pct = 1.0 - ai_pct - human_pct
+
+            # Mixed content: both AI and human sentences present
+            mixed_content = ai_count > 0 and human_count > 0
+
+            overall_ai = float(np.mean([s["ai_probability"] for s in per_sentence]))
+
+            confidence = (
+                "high"
+                if abs(overall_ai - 0.5) > 0.3
+                else "medium" if abs(overall_ai - 0.5) > 0.15 else "low"
             )
 
-        total = len(sentences)
-        ai_pct = ai_count / total
-        human_pct = human_count / total
-        uncertain_pct = 1.0 - ai_pct - human_pct
-
-        # Mixed content: both AI and human sentences present
-        mixed_content = ai_count > 0 and human_count > 0
-
-        overall_ai = float(np.mean([s["ai_probability"] for s in per_sentence]))
-
-        confidence = (
-            "high"
-            if abs(overall_ai - 0.5) > 0.3
-            else "medium" if abs(overall_ai - 0.5) > 0.15 else "low"
-        )
-
-        return {
-            "signal": signal,
-            "ai_probability": round(overall_ai, 4),
-            "confidence": confidence,
-            "mixed_content_detected": mixed_content,
-            "per_sentence": per_sentence,
-            "details": {
-                "total_sentences": total,
-                "ai_sentence_count": ai_count,
-                "human_sentence_count": human_count,
-                "uncertain_sentence_count": total - ai_count - human_count,
-                "ai_sentence_percentage": round(ai_pct * 100, 1),
-                "human_sentence_percentage": round(human_pct * 100, 1),
-                "uncertain_sentence_percentage": round(uncertain_pct * 100, 1),
-                "thresholds": {
-                    "ai": AI_THRESHOLD,
-                    "human": HUMAN_THRESHOLD,
+            return {
+                "signal": signal,
+                "ai_probability": round(overall_ai, 4),
+                "confidence": confidence,
+                "mixed_content_detected": mixed_content,
+                "per_sentence": per_sentence,
+                "details": {
+                    "total_sentences": total,
+                    "ai_sentence_count": ai_count,
+                    "human_sentence_count": human_count,
+                    "uncertain_sentence_count": total - ai_count - human_count,
+                    "ai_sentence_percentage": round(ai_pct * 100, 1),
+                    "human_sentence_percentage": round(human_pct * 100, 1),
+                    "uncertain_sentence_percentage": round(uncertain_pct * 100, 1),
+                    "thresholds": {
+                        "ai": AI_THRESHOLD,
+                        "human": HUMAN_THRESHOLD,
+                    },
                 },
-            },
-        }
+            }
+        except Exception as exc:
+            logger.warning("%s degraded: %s", signal, exc)
+            return self._empty_result(signal, f"analysis failed: {exc}")

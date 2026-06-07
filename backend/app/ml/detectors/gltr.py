@@ -83,39 +83,45 @@ class GLTRDetector(BaseDetector):
         if len(text.split()) < 5:
             return self._empty_result(signal, "text too short (< 5 words)")
 
-        tokenizer, model = await ModelRegistry.get_model("gpt2")
-        token_data = self._analyze_tokens(text, model, tokenizer)
-        if not token_data:
-            return self._empty_result(signal, "could not tokenize text")
+        try:
+            tokenizer, model = await ModelRegistry.get_model("gpt2")
+            token_data = self._analyze_tokens(text, model, tokenizer)
+            if not token_data:
+                return self._empty_result(signal, "could not tokenize text")
 
-        total = len(token_data)
-        counts = {"top10": 0, "top100": 0, "top1000": 0, "rare": 0}
-        for t in token_data:
-            counts[t["bucket"]] += 1
+            total = len(token_data)
+            counts = {"top10": 0, "top100": 0, "top1000": 0, "rare": 0}
+            for t in token_data:
+                counts[t["bucket"]] += 1
 
-        top10_ratio = counts["top10"] / total
-        ai_prob = self._clamp(self._sigmoid((top10_ratio - 0.45) / 0.15))
+            top10_ratio = counts["top10"] / total
+            ai_prob = self._clamp(self._sigmoid((top10_ratio - 0.45) / 0.15))
 
-        mean_rank = float(np.mean([t["rank"] for t in token_data]))
-        mean_entropy = float(np.mean([t["entropy"] for t in token_data]))
+            mean_rank = float(np.mean([t["rank"] for t in token_data]))
+            mean_entropy = float(np.mean([t["entropy"] for t in token_data]))
 
-        confidence = (
-            "high" if abs(ai_prob - 0.5) > 0.3 else "medium" if abs(ai_prob - 0.5) > 0.15 else "low"
-        )
+            confidence = (
+                "high"
+                if abs(ai_prob - 0.5) > 0.3
+                else "medium" if abs(ai_prob - 0.5) > 0.15 else "low"
+            )
 
-        return {
-            "signal": signal,
-            "ai_probability": round(ai_prob, 4),
-            "confidence": confidence,
-            "token_data": token_data,
-            "details": {
-                "total_tokens": total,
-                "top10_ratio": round(top10_ratio, 4),
-                "top100_ratio": round(counts["top100"] / total, 4),
-                "top1000_ratio": round(counts["top1000"] / total, 4),
-                "rare_ratio": round(counts["rare"] / total, 4),
-                "mean_rank": round(mean_rank, 2),
-                "mean_entropy": round(mean_entropy, 4),
-                "bucket_counts": counts,
-            },
-        }
+            return {
+                "signal": signal,
+                "ai_probability": round(ai_prob, 4),
+                "confidence": confidence,
+                "token_data": token_data,
+                "details": {
+                    "total_tokens": total,
+                    "top10_ratio": round(top10_ratio, 4),
+                    "top100_ratio": round(counts["top100"] / total, 4),
+                    "top1000_ratio": round(counts["top1000"] / total, 4),
+                    "rare_ratio": round(counts["rare"] / total, 4),
+                    "mean_rank": round(mean_rank, 2),
+                    "mean_entropy": round(mean_entropy, 4),
+                    "bucket_counts": counts,
+                },
+            }
+        except Exception as exc:
+            logger.warning("%s degraded: %s", signal, exc)
+            return self._empty_result(signal, f"analysis failed: {exc}")
